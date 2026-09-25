@@ -224,7 +224,11 @@ export function generateAll(ideas: Idea[], direction: Direction, range: string) 
   set((s) => ({
     ...s,
     campaigns: s.campaigns.map((c, idx) => {
-      if (c.kind !== "Automated Invite") return c;
+      if (c.kind !== "Automated Invite") {
+        const touch = season ? ` Enjoy New York ${seasonLine}.` : "";
+        const upd = (x: SegmentContent): SegmentContent => ({ reviewed: { email: false, text: false }, email: { ...x.email, body: x.email.body.replace(/ Enjoy New York.*$/, "") + touch }, text: x.text });
+        return { ...c, origin: "ai" as Origin, status: "Needs review" as Status, updated: "Today", version: c.version + 1, content: { direct: upd(c.content.direct), ota: upd(c.content.ota) }, why: { template: "Kept your clean notice layout — guests need the facts first.", subject: "Left clear and factual; transactional messages shouldn't sell.", image: "Kept your current image.", text: "Unchanged except for tone — this message is operational.", context: [range, "light seasonal touch"] } };
+      }
       // Relevant personalization, not personalization everywhere.
       const event = usable.filter((i) => i.group !== "Seasonal moments")[idx % Math.max(1, usable.length - 1)];
       const useEvent = event && (event.id !== "conference" || ["alv", "m3"].includes(c.id)) && c.id !== "m12";
@@ -263,7 +267,7 @@ export function generateAll(ideas: Idea[], direction: Direction, range: string) 
       };
     }),
     versions: [
-      ...s.campaigns.filter((c) => c.kind === "Automated Invite").map((c) => ({ campaignId: c.id, v: c.version + 1, label: "Created with Directful AI", by: "Directful AI", when: "Today" })),
+      ...s.campaigns.map((c) => ({ campaignId: c.id, v: c.version + 1, label: "Created with Directful AI", by: "Directful AI", when: "Today" })),
       ...s.versions,
     ],
   }));
