@@ -46,14 +46,6 @@ function loadSlots(media: MediaItem[]): Slots {
   return { text: seed(), email: seed() };
 }
 
-  return (
-    <div className="flex items-start justify-between gap-3 py-[3px]">
-      <span className="shrink-0 text-[10.5px] text-muted-foreground">{label}</span>
-      <span className="min-w-0 truncate text-right text-[10.5px] font-medium text-card-foreground">{value}</span>
-    </div>
-  );
-}
-
 const TYPE_LABEL: Record<MediaType, string> = { image: "Image", video: "Video", document: "Document" };
 
 /** A campaign attached to one file: which guest segments receive it. */
