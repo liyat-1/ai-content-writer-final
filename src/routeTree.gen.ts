@@ -16,6 +16,7 @@ import { Route as CanvasRouteImport } from './routes/canvas'
 import { Route as OtaRouteImport } from './routes/ota'
 import { Route as RoiRouteImport } from './routes/roi'
 import { Route as StructuredRouteImport } from './routes/structured'
+import { Route as MarketingAiContentRouteImport } from './routes/marketing.ai-content'
 import { Route as MarketingInPropertyRouteImport } from './routes/marketing.in-property'
 import { Route as MarketingInvitesRouteImport } from './routes/marketing.invites'
 import { Route as MarketingMediaRouteImport } from './routes/marketing.media'
@@ -62,6 +63,11 @@ const RoiRoute = RoiRouteImport.update({
 const StructuredRoute = StructuredRouteImport.update({
   id: '/structured',
   path: '/structured',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketingAiContentRoute = MarketingAiContentRouteImport.update({
+  id: '/marketing/ai-content',
+  path: '/marketing/ai-content',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketingInPropertyRoute = MarketingInPropertyRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/ota': typeof OtaRouteWithChildren
   '/roi': typeof RoiRoute
   '/structured': typeof StructuredRoute
+  '/marketing/ai-content': typeof MarketingAiContentRoute
   '/marketing/in-property': typeof MarketingInPropertyRoute
   '/marketing/invites': typeof MarketingInvitesRoute
   '/marketing/media': typeof MarketingMediaRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/canvas': typeof CanvasRoute
   '/roi': typeof RoiRoute
   '/structured': typeof StructuredRoute
+  '/marketing/ai-content': typeof MarketingAiContentRoute
   '/marketing/in-property': typeof MarketingInPropertyRoute
   '/marketing/invites': typeof MarketingInvitesRoute
   '/marketing/media': typeof MarketingMediaRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/ota': typeof OtaRouteWithChildren
   '/roi': typeof RoiRoute
   '/structured': typeof StructuredRoute
+  '/marketing/ai-content': typeof MarketingAiContentRoute
   '/marketing/in-property': typeof MarketingInPropertyRoute
   '/marketing/invites': typeof MarketingInvitesRoute
   '/marketing/media': typeof MarketingMediaRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/ota'
     | '/roi'
     | '/structured'
+    | '/marketing/ai-content'
     | '/marketing/in-property'
     | '/marketing/invites'
     | '/marketing/media'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/canvas'
     | '/roi'
     | '/structured'
+    | '/marketing/ai-content'
     | '/marketing/in-property'
     | '/marketing/invites'
     | '/marketing/media'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/ota'
     | '/roi'
     | '/structured'
+    | '/marketing/ai-content'
     | '/marketing/in-property'
     | '/marketing/invites'
     | '/marketing/media'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   OtaRoute: typeof OtaRouteWithChildren
   RoiRoute: typeof RoiRoute
   StructuredRoute: typeof StructuredRoute
+  MarketingAiContentRoute: typeof MarketingAiContentRoute
   MarketingInPropertyRoute: typeof MarketingInPropertyRoute
   MarketingInvitesRoute: typeof MarketingInvitesRoute
   MarketingMediaRoute: typeof MarketingMediaRoute
@@ -317,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/structured'
       fullPath: '/structured'
       preLoaderRoute: typeof StructuredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketing/ai-content': {
+      id: '/marketing/ai-content'
+      path: '/marketing/ai-content'
+      fullPath: '/marketing/ai-content'
+      preLoaderRoute: typeof MarketingAiContentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketing/in-property': {
@@ -436,6 +456,7 @@ const rootRouteChildren: RootRouteChildren = {
   OtaRoute: OtaRouteWithChildren,
   RoiRoute: RoiRoute,
   StructuredRoute: StructuredRoute,
+  MarketingAiContentRoute: MarketingAiContentRoute,
   MarketingInPropertyRoute: MarketingInPropertyRoute,
   MarketingInvitesRoute: MarketingInvitesRoute,
   MarketingMediaRoute: MarketingMediaRoute,
