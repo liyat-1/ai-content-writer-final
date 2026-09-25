@@ -86,6 +86,7 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
   const [panel, setPanel] = useState<Panel>(null);
   const [confirm, setConfirm] = useState<"leave" | "save" | "revert" | null>(null);
   const [promotionPicker, setPromotionPicker] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const dirty = useMemo(() => draft ? JSON.stringify(draft) !== baseline : false, [draft, baseline]);
 
   useEffect(() => {
