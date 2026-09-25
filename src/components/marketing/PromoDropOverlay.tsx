@@ -425,6 +425,22 @@ export function PromoDropOverlay({
                             </p>
                           </div>
                         </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setPicker(index)}
+                            className="flex-1 rounded-sm border border-brand/40 bg-background px-2 py-1 text-[10.5px] font-semibold text-brand transition-colors hover:bg-brand-soft"
+                          >
+                            Change offer
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAreas((current) => current.map((v, i) => (i === index ? null : v)))}
+                            className="flex-1 rounded-sm border border-border bg-background px-2 py-1 text-[10.5px] font-semibold text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                          >
+                            Clear column
+                          </button>
+                        </div>
                         <button
                           type="button"
                           onClick={() => setDetails(open ? null : index)}
@@ -451,18 +467,6 @@ export function PromoDropOverlay({
                             <p className="mt-1.5 border-t border-border pt-1.5 text-[10.5px] leading-snug text-muted-foreground">
                               {promotion.detail}
                             </p>
-                            <div className="mt-2 flex items-center gap-3 border-t border-border pt-2">
-                              <button type="button" onClick={() => setPicker(index)} className="text-[10.5px] font-semibold text-brand hover:underline">
-                                Change offer
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setAreas((current) => current.map((v, i) => (i === index ? null : v)))}
-                                className="text-[10.5px] text-muted-foreground hover:text-destructive"
-                              >
-                                Clear column
-                              </button>
-                            </div>
                           </div>
                         )}
                       </div>
