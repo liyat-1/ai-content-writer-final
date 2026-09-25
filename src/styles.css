@@ -172,3 +172,50 @@
     text-rendering: optimizeLegibility;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Directful AI energy — sharp edges, brand blue, soft light.          */
+/* ------------------------------------------------------------------ */
+@keyframes ai-twinkle { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(0.72) rotate(45deg); opacity: 0.65; } }
+@keyframes ai-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes ai-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes ai-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--brand) 35%, transparent), 0 8px 24px -10px color-mix(in oklch, var(--brand) 55%, transparent); } 50% { box-shadow: 0 0 0 4px color-mix(in oklch, var(--brand) 12%, transparent), 0 10px 30px -8px color-mix(in oklch, var(--brand) 70%, transparent); } }
+@keyframes ai-sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes ai-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+@utility ai-twinkle { animation: ai-twinkle 2.4s ease-in-out infinite; }
+@utility ai-rise { animation: ai-rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@utility ai-float { animation: ai-float 5s ease-in-out infinite; }
+@utility ai-pulse { animation: ai-pulse 2.6s ease-in-out infinite; }
+@utility ai-text {
+  background-image: linear-gradient(100deg, var(--brand) 0%, color-mix(in oklch, var(--brand) 55%, oklch(0.72 0.14 215)) 45%, var(--brand) 90%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ai-shimmer 6s linear infinite;
+}
+@utility ai-surface {
+  background:
+    radial-gradient(60% 50% at 15% 0%, color-mix(in oklch, var(--brand) 16%, transparent), transparent 70%),
+    radial-gradient(50% 45% at 100% 20%, color-mix(in oklch, oklch(0.72 0.14 215) 14%, transparent), transparent 70%),
+    var(--canvas);
+}
+@utility ai-grid {
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--brand) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--brand) 7%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+@utility ai-edge {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(120deg, color-mix(in oklch, var(--brand) 70%, transparent), color-mix(in oklch, oklch(0.72 0.14 215) 55%, transparent), color-mix(in oklch, var(--brand) 20%, transparent)) border-box;
+}
+@utility ai-button {
+  background-image: linear-gradient(110deg, var(--brand), color-mix(in oklch, var(--brand) 70%, oklch(0.62 0.15 220)));
+  color: var(--brand-foreground);
+  position: relative;
+  overflow: hidden;
+}

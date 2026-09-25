@@ -17,6 +17,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Sparkles,
+  FlaskConical,
+  History,
+  Settings2,
 } from "lucide-react";
 import propertyPhoto from "../../assets/pool-dusk.jpg";
 import { CURRENT_USER, initialsOf } from "@/lib/marketing";
@@ -43,10 +46,20 @@ const GROUPS: { label?: string; items: Item[] }[] = [
     ],
   },
   {
+    label: "Content Library",
+    items: [
+      { label: "Create", to: "/content", icon: Sparkles },
+      { label: "Published", to: "/content/published", icon: Send },
+      { label: "Performance", to: "/content/performance", icon: BarChart3 },
+      { label: "A/B Tests", to: "/content/ab-tests", icon: FlaskConical },
+      { label: "History", to: "/content/history", icon: History },
+      { label: "Settings", to: "/content/settings", icon: Settings2 },
+    ],
+  },
+  {
     label: "Marketing Assets",
     items: [
       { label: "Media Library", to: "/marketing/media", icon: ImageIcon },
-      { label: "AI Content", to: "/marketing/ai-content", icon: Sparkles },
       { label: "Promotions", to: "/marketing/promotions", icon: Gift },
     ],
   },
@@ -57,7 +70,9 @@ const MOBILE_NAV = [
   { label: "Transactional", to: "/marketing/transactional" },
   { label: "In-property", to: "/marketing/in-property" },
   { label: "Media", to: "/marketing/media" },
-  { label: "AI Content", to: "/marketing/ai-content" },
+  { label: "Create", to: "/content" },
+  { label: "Published", to: "/content/published" },
+  { label: "History", to: "/content/history" },
   { label: "Promotions", to: "/marketing/promotions" },
   { label: "Drip", to: "/campaign" },
 ];
@@ -148,7 +163,7 @@ export function MarketingShell({
                 </p>
               )}
               {group.items.map((item) => {
-                const active = item.to ? pathname.startsWith(item.to) : false;
+                const active = item.to ? (item.to === "/content" ? pathname === "/content" || pathname === "/content" : pathname.startsWith(item.to)) : false;
                 const cls = `flex w-full items-center gap-2.5 rounded-md py-[7px] text-left text-[12.5px] transition-colors ${
                   collapsed ? "justify-center px-0" : "px-2.5"
                 } ${
@@ -209,7 +224,7 @@ export function MarketingShell({
 
         <div className="flex gap-1 overflow-x-auto border-b border-border bg-card px-3 py-2 lg:hidden">
           {MOBILE_NAV.map((item) => {
-            const active = pathname.startsWith(item.to);
+            const active = item.to === "/content" ? pathname === "/content" || pathname === "/content" : pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}
