@@ -46,7 +46,6 @@ function loadSlots(media: MediaItem[]): Slots {
   return { text: seed(), email: seed() };
 }
 
-function ConfigRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-3 py-[3px]">
       <span className="shrink-0 text-[10.5px] text-muted-foreground">{label}</span>
