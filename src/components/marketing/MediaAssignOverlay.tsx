@@ -337,7 +337,6 @@ export function MediaAssignOverlay({
             {columns.map((mediaId, index) => {
               const item = itemById(mediaId);
               const assigned = item ? campaignsOn(item.id) : [];
-              const open = details === index;
               return (
                 <section
                   key={index}
