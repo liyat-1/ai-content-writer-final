@@ -247,7 +247,7 @@ export function MediaAssignOverlay({
           <button
             key={c}
             type="button"
-            onClick={() => { setChannel(c); setDetails(null); }}
+            onClick={() => setChannel(c)}
             aria-pressed={channel === c}
             className={`rounded-t-md border-b-2 px-4 py-2 text-[12.5px] font-semibold transition-colors ${
               channel === c ? "border-brand text-brand" : "border-transparent text-muted-foreground hover:text-foreground"
