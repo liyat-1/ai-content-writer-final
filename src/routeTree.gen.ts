@@ -16,6 +16,12 @@ import { Route as CanvasRouteImport } from './routes/canvas'
 import { Route as OtaRouteImport } from './routes/ota'
 import { Route as RoiRouteImport } from './routes/roi'
 import { Route as StructuredRouteImport } from './routes/structured'
+import { Route as ContentIndexRouteImport } from './routes/content.index'
+import { Route as ContentAbTestsRouteImport } from './routes/content.ab-tests'
+import { Route as ContentHistoryRouteImport } from './routes/content.history'
+import { Route as ContentPerformanceRouteImport } from './routes/content.performance'
+import { Route as ContentPublishedRouteImport } from './routes/content.published'
+import { Route as ContentSettingsRouteImport } from './routes/content.settings'
 import { Route as MarketingAiContentRouteImport } from './routes/marketing.ai-content'
 import { Route as MarketingInPropertyRouteImport } from './routes/marketing.in-property'
 import { Route as MarketingInvitesRouteImport } from './routes/marketing.invites'
@@ -63,6 +69,36 @@ const RoiRoute = RoiRouteImport.update({
 const StructuredRoute = StructuredRouteImport.update({
   id: '/structured',
   path: '/structured',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentIndexRoute = ContentIndexRouteImport.update({
+  id: '/content/',
+  path: '/content/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentAbTestsRoute = ContentAbTestsRouteImport.update({
+  id: '/content/ab-tests',
+  path: '/content/ab-tests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentHistoryRoute = ContentHistoryRouteImport.update({
+  id: '/content/history',
+  path: '/content/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentPerformanceRoute = ContentPerformanceRouteImport.update({
+  id: '/content/performance',
+  path: '/content/performance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentPublishedRoute = ContentPublishedRouteImport.update({
+  id: '/content/published',
+  path: '/content/published',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentSettingsRoute = ContentSettingsRouteImport.update({
+  id: '/content/settings',
+  path: '/content/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketingAiContentRoute = MarketingAiContentRouteImport.update({
@@ -139,6 +175,11 @@ export interface FileRoutesByFullPath {
   '/ota': typeof OtaRouteWithChildren
   '/roi': typeof RoiRoute
   '/structured': typeof StructuredRoute
+  '/content/ab-tests': typeof ContentAbTestsRoute
+  '/content/history': typeof ContentHistoryRoute
+  '/content/performance': typeof ContentPerformanceRoute
+  '/content/published': typeof ContentPublishedRoute
+  '/content/settings': typeof ContentSettingsRoute
   '/marketing/ai-content': typeof MarketingAiContentRoute
   '/marketing/in-property': typeof MarketingInPropertyRoute
   '/marketing/invites': typeof MarketingInvitesRoute
@@ -151,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/ota/opportunities': typeof OtaOpportunitiesRoute
   '/ota/performance': typeof OtaPerformanceRoute
   '/ota/settings': typeof OtaSettingsRoute
+  '/content/': typeof ContentIndexRoute
   '/ota/': typeof OtaIndexRoute
 }
 export interface FileRoutesByTo {
@@ -160,6 +202,11 @@ export interface FileRoutesByTo {
   '/canvas': typeof CanvasRoute
   '/roi': typeof RoiRoute
   '/structured': typeof StructuredRoute
+  '/content/ab-tests': typeof ContentAbTestsRoute
+  '/content/history': typeof ContentHistoryRoute
+  '/content/performance': typeof ContentPerformanceRoute
+  '/content/published': typeof ContentPublishedRoute
+  '/content/settings': typeof ContentSettingsRoute
   '/marketing/ai-content': typeof MarketingAiContentRoute
   '/marketing/in-property': typeof MarketingInPropertyRoute
   '/marketing/invites': typeof MarketingInvitesRoute
@@ -172,6 +219,7 @@ export interface FileRoutesByTo {
   '/ota/opportunities': typeof OtaOpportunitiesRoute
   '/ota/performance': typeof OtaPerformanceRoute
   '/ota/settings': typeof OtaSettingsRoute
+  '/content': typeof ContentIndexRoute
   '/ota': typeof OtaIndexRoute
 }
 export interface FileRoutesById {
@@ -183,6 +231,11 @@ export interface FileRoutesById {
   '/ota': typeof OtaRouteWithChildren
   '/roi': typeof RoiRoute
   '/structured': typeof StructuredRoute
+  '/content/ab-tests': typeof ContentAbTestsRoute
+  '/content/history': typeof ContentHistoryRoute
+  '/content/performance': typeof ContentPerformanceRoute
+  '/content/published': typeof ContentPublishedRoute
+  '/content/settings': typeof ContentSettingsRoute
   '/marketing/ai-content': typeof MarketingAiContentRoute
   '/marketing/in-property': typeof MarketingInPropertyRoute
   '/marketing/invites': typeof MarketingInvitesRoute
@@ -195,6 +248,7 @@ export interface FileRoutesById {
   '/ota/opportunities': typeof OtaOpportunitiesRoute
   '/ota/performance': typeof OtaPerformanceRoute
   '/ota/settings': typeof OtaSettingsRoute
+  '/content/': typeof ContentIndexRoute
   '/ota/': typeof OtaIndexRoute
 }
 export interface FileRouteTypes {
@@ -207,6 +261,11 @@ export interface FileRouteTypes {
     | '/ota'
     | '/roi'
     | '/structured'
+    | '/content/ab-tests'
+    | '/content/history'
+    | '/content/performance'
+    | '/content/published'
+    | '/content/settings'
     | '/marketing/ai-content'
     | '/marketing/in-property'
     | '/marketing/invites'
@@ -219,6 +278,7 @@ export interface FileRouteTypes {
     | '/ota/opportunities'
     | '/ota/performance'
     | '/ota/settings'
+    | '/content/'
     | '/ota/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -228,6 +288,11 @@ export interface FileRouteTypes {
     | '/canvas'
     | '/roi'
     | '/structured'
+    | '/content/ab-tests'
+    | '/content/history'
+    | '/content/performance'
+    | '/content/published'
+    | '/content/settings'
     | '/marketing/ai-content'
     | '/marketing/in-property'
     | '/marketing/invites'
@@ -240,6 +305,7 @@ export interface FileRouteTypes {
     | '/ota/opportunities'
     | '/ota/performance'
     | '/ota/settings'
+    | '/content'
     | '/ota'
   id:
     | '__root__'
@@ -250,6 +316,11 @@ export interface FileRouteTypes {
     | '/ota'
     | '/roi'
     | '/structured'
+    | '/content/ab-tests'
+    | '/content/history'
+    | '/content/performance'
+    | '/content/published'
+    | '/content/settings'
     | '/marketing/ai-content'
     | '/marketing/in-property'
     | '/marketing/invites'
@@ -262,6 +333,7 @@ export interface FileRouteTypes {
     | '/ota/opportunities'
     | '/ota/performance'
     | '/ota/settings'
+    | '/content/'
     | '/ota/'
   fileRoutesById: FileRoutesById
 }
@@ -273,12 +345,18 @@ export interface RootRouteChildren {
   OtaRoute: typeof OtaRouteWithChildren
   RoiRoute: typeof RoiRoute
   StructuredRoute: typeof StructuredRoute
+  ContentAbTestsRoute: typeof ContentAbTestsRoute
+  ContentHistoryRoute: typeof ContentHistoryRoute
+  ContentPerformanceRoute: typeof ContentPerformanceRoute
+  ContentPublishedRoute: typeof ContentPublishedRoute
+  ContentSettingsRoute: typeof ContentSettingsRoute
   MarketingAiContentRoute: typeof MarketingAiContentRoute
   MarketingInPropertyRoute: typeof MarketingInPropertyRoute
   MarketingInvitesRoute: typeof MarketingInvitesRoute
   MarketingMediaRoute: typeof MarketingMediaRoute
   MarketingPromotionsRoute: typeof MarketingPromotionsRoute
   MarketingTransactionalRoute: typeof MarketingTransactionalRoute
+  ContentIndexRoute: typeof ContentIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -330,6 +408,48 @@ declare module '@tanstack/react-router' {
       path: '/structured'
       fullPath: '/structured'
       preLoaderRoute: typeof StructuredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/': {
+      id: '/content/'
+      path: '/content'
+      fullPath: '/content/'
+      preLoaderRoute: typeof ContentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/ab-tests': {
+      id: '/content/ab-tests'
+      path: '/content/ab-tests'
+      fullPath: '/content/ab-tests'
+      preLoaderRoute: typeof ContentAbTestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/history': {
+      id: '/content/history'
+      path: '/content/history'
+      fullPath: '/content/history'
+      preLoaderRoute: typeof ContentHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/performance': {
+      id: '/content/performance'
+      path: '/content/performance'
+      fullPath: '/content/performance'
+      preLoaderRoute: typeof ContentPerformanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/published': {
+      id: '/content/published'
+      path: '/content/published'
+      fullPath: '/content/published'
+      preLoaderRoute: typeof ContentPublishedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/settings': {
+      id: '/content/settings'
+      path: '/content/settings'
+      fullPath: '/content/settings'
+      preLoaderRoute: typeof ContentSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketing/ai-content': {
@@ -456,12 +576,18 @@ const rootRouteChildren: RootRouteChildren = {
   OtaRoute: OtaRouteWithChildren,
   RoiRoute: RoiRoute,
   StructuredRoute: StructuredRoute,
+  ContentAbTestsRoute: ContentAbTestsRoute,
+  ContentHistoryRoute: ContentHistoryRoute,
+  ContentPerformanceRoute: ContentPerformanceRoute,
+  ContentPublishedRoute: ContentPublishedRoute,
+  ContentSettingsRoute: ContentSettingsRoute,
   MarketingAiContentRoute: MarketingAiContentRoute,
   MarketingInPropertyRoute: MarketingInPropertyRoute,
   MarketingInvitesRoute: MarketingInvitesRoute,
   MarketingMediaRoute: MarketingMediaRoute,
   MarketingPromotionsRoute: MarketingPromotionsRoute,
   MarketingTransactionalRoute: MarketingTransactionalRoute,
+  ContentIndexRoute: ContentIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
