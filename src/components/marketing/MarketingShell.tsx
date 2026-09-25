@@ -16,6 +16,7 @@ import {
   Info,
   PanelLeftClose,
   PanelLeftOpen,
+  Sparkles,
 } from "lucide-react";
 import propertyPhoto from "../../assets/pool-dusk.jpg";
 import { CURRENT_USER, initialsOf } from "@/lib/marketing";
@@ -44,7 +45,8 @@ const GROUPS: { label?: string; items: Item[] }[] = [
   {
     label: "Marketing Assets",
     items: [
-      { label: "Media", to: "/marketing/media", icon: ImageIcon },
+      { label: "Media Library", to: "/marketing/media", icon: ImageIcon },
+      { label: "AI Content", to: "/marketing/ai-content", icon: Sparkles },
       { label: "Promotions", to: "/marketing/promotions", icon: Gift },
     ],
   },
@@ -55,6 +57,7 @@ const MOBILE_NAV = [
   { label: "Transactional", to: "/marketing/transactional" },
   { label: "In-property", to: "/marketing/in-property" },
   { label: "Media", to: "/marketing/media" },
+  { label: "AI Content", to: "/marketing/ai-content" },
   { label: "Promotions", to: "/marketing/promotions" },
   { label: "Drip", to: "/campaign" },
 ];
