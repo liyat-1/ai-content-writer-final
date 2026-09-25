@@ -135,3 +135,10 @@
 - [x] Media assignment rebuilt on the promo model: fixed campaign column, file columns with Change file / Browse library, Direct/OTA checkboxes
 - [x] Both boards are horizontally scrollable with Add offer / Add file, so the count is not fixed at three
 - [x] iPhone preview: composer pinned outside the scroll area, frosted glass, larger; content no longer overflows the frame
+
+## Carried over from the credit pause
+
+- [ ] Fix the content editor freezing when closing (X) or saving
+- [ ] Move Change/Clear out of "See config details" onto the promo side; config shows promo details only; media columns get Change file / Clear column directly
+- [ ] Verify content editor workflows at desktop and mobile widths
+- [ ] Open and verify the Directful AI Content page (built but never tested)
