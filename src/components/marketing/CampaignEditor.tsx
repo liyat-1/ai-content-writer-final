@@ -5,6 +5,9 @@ import { EmailEditor, EmailPreview } from "./EmailEditor";
 import { PromotionSelector } from "./PromotionSelector";
 import { SmsPreview } from "@/components/editor/SmsPreview";
 import { checkContent } from "./contentChecks";
+import { AiEditPanel } from "@/components/ai/AiEditPanel";
+import { Sparkle } from "@/components/ai/Sparkle";
+import type { Copy } from "@/lib/aiWriter";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
