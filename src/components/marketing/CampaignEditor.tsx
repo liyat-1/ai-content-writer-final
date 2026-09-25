@@ -226,6 +226,9 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
                     <div className="border-t border-border px-4 py-4">
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="ml-auto flex flex-wrap items-center gap-1.5">
+                          <Button variant="brand" size="sm" className="px-2.5" onClick={() => setAiOpen(true)}>
+                            <Sparkle size={13} />Edit with AI
+                          </Button>
                           <SectionAction icon={History} label="History" active={panel === "history"} onClick={() => setPanel((p) => (p === "history" ? null : "history"))} />
                           <SectionAction icon={HelpCircle} label="Help" active={panel === "help"} onClick={() => setPanel((p) => (p === "help" ? null : "help"))} />
                           <SectionAction icon={ShieldCheck} label="Spam check" active={panel === "spam"} onClick={() => setPanel((p) => (p === "spam" ? null : "spam"))} />
