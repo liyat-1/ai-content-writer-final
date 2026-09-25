@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, HelpCircle, ShieldCheck, X } from "lucide-react";
 import { Sparkle } from "@/components/ai/Sparkle";
 import { AiEditPanel } from "@/components/ai/AiEditPanel";
@@ -42,7 +42,7 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
   // Viewing a segment/channel counts as reviewing it.
   const markReviewed = (s: Segment, ch: Channel) =>
     setDraft((d) => (d.content[s].reviewed[ch] ? d : { ...d, content: { ...d.content, [s]: { ...d.content[s], reviewed: { ...d.content[s].reviewed, [ch]: true } } } }));
-  useMemo(() => markReviewed(segment, channel), [segment, channel]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => markReviewed(segment, channel), [segment, channel]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const edit = (fn: (s: LibraryCampaign["content"][Segment]) => void) =>
     setDraft((d) => { const n = clone(d); fn(n.content[segment]); return n; });
