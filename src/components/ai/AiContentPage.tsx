@@ -380,15 +380,20 @@ function ReviewHub({
       </Card>
     );
   const approved = drafts.filter((d) => d.state === "Approved").length;
+  const published = drafts.filter((d) => d.state === "Published").length;
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-[18px] font-semibold">Your content is ready to review</h2>
-          <p className="text-[12.5px] text-muted-foreground">{approved} of 7 approved · 14 messages (7 emails, 7 texts)</p>
+          <p className="text-[12.5px] text-muted-foreground">
+            {approved} of {drafts.length} approved{published > 0 ? ` · ${published} published` : ""} · 14 messages (7 emails, 7 texts)
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setDrafts(drafts.map((d) => ({ ...d, state: "Approved" })))}>Approve all</Button>
+          {approved > 0 && (
+            <Button variant="outline" size="sm" onClick={() => setDrafts(drafts.map((d) => (d.state === "Draft" ? { ...d, state: "Approved" } : d)))}>Approve all</Button>
+          )}
           <Button size="sm" disabled={approved === 0} onClick={() => setPublishing(true)}>
             <Send size={13} /> Publish release
           </Button>
@@ -406,7 +411,7 @@ function ReviewHub({
             <p className="mt-2 text-[11.5px] text-muted-foreground"><Sparkle size={10} className="mr-1 inline text-brand" />{d.rationale}</p>
             <div className="mt-3 flex gap-2">
               <Button size="sm" variant="outline" onClick={() => onOpen(d.id)}>Review</Button>
-              {d.state !== "Approved" && (
+              {d.state === "Draft" && (
                 <Button size="sm" variant="ghost" onClick={() => setDrafts(drafts.map((x) => (x.id === d.id ? { ...x, state: "Approved" } : x)))}>
                   <Check size={13} /> Approve
                 </Button>
