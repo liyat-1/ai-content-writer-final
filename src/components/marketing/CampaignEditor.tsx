@@ -349,6 +349,27 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
         onSelect={setPromotion}
       />
 
+      {aiOpen && (
+        <AiEditPanel
+          className="z-[75]"
+          title={`${draft.name} · ${AUDIENCE_LABEL[audience]}`}
+          copy={
+            activeChannel === "email"
+              ? { kind: "email", email: { subject: variant.email.subject, preheader: variant.email.preheader, heading: variant.email.heading, body: variant.email.body, ctaLabel: variant.email.ctaLabel } }
+              : { kind: "text", text: { message: variant.text.message } }
+          }
+          onApply={(next) => {
+            setVariant(
+              next.kind === "email"
+                ? { ...variant, email: { ...variant.email, subject: next.email.subject, preheader: next.email.preheader, heading: next.email.heading, body: next.email.body, ctaLabel: next.email.ctaLabel } }
+                : { ...variant, text: { ...variant.text, message: next.text.message } },
+              activeChannel,
+            );
+          }}
+          onClose={() => setAiOpen(false)}
+        />
+      )}
+
       <AlertDialog open={confirm !== null} onOpenChange={(value) => !value && setConfirm(null)}>
         <AlertDialogContent className="border-border bg-card shadow-float">
           <AlertDialogHeader><AlertDialogTitle>{confirm === "leave" ? "Unsaved changes" : confirm === "save" ? "Save changes to active campaign?" : "Revert content to suggested?"}</AlertDialogTitle><AlertDialogDescription>{confirm === "leave" ? "You have unsaved changes. Leave without saving?" : confirm === "save" ? "This campaign is active. Updated content will be used for future messages sent to eligible guests." : `Only ${AUDIENCE_LABEL[audience]} ${activeChannel} content for ${draft.name} will return to Directful’s suggested content.`}</AlertDialogDescription></AlertDialogHeader>
