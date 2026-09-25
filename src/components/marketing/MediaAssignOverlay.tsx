@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, FileStack, GripVertical, Info, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { Check, FileStack, GripVertical, Info, Plus, Search, Trash2, Upload, X } from "lucide-react";
 import { MediaThumb } from "./MediaPicker";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -128,7 +128,6 @@ export function MediaAssignOverlay({
   const [dragging, setDragging] = useState<string | null>(null);
   const [over, setOver] = useState<number | null>(null);
   const [picker, setPicker] = useState<number | null>(null);
-  const [details, setDetails] = useState<number | null>(null);
   const [bulk, setBulk] = useState<BulkScope | null>(null);
 
   useEffect(() => {
