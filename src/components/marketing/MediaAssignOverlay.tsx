@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, FileStack, GripVertical, Info, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { Check, FileStack, GripVertical, Info, Plus, Search, Trash2, Upload, X } from "lucide-react";
 import { MediaThumb } from "./MediaPicker";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -44,15 +44,6 @@ function loadSlots(media: MediaItem[]): Slots {
     /* ignore */
   }
   return { text: seed(), email: seed() };
-}
-
-function ConfigRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start justify-between gap-3 py-[3px]">
-      <span className="shrink-0 text-[10.5px] text-muted-foreground">{label}</span>
-      <span className="min-w-0 truncate text-right text-[10.5px] font-medium text-card-foreground">{value}</span>
-    </div>
-  );
 }
 
 const TYPE_LABEL: Record<MediaType, string> = { image: "Image", video: "Video", document: "Document" };
@@ -137,7 +128,6 @@ export function MediaAssignOverlay({
   const [dragging, setDragging] = useState<string | null>(null);
   const [over, setOver] = useState<number | null>(null);
   const [picker, setPicker] = useState<number | null>(null);
-  const [details, setDetails] = useState<number | null>(null);
   const [bulk, setBulk] = useState<BulkScope | null>(null);
 
   useEffect(() => {
@@ -257,7 +247,7 @@ export function MediaAssignOverlay({
           <button
             key={c}
             type="button"
-            onClick={() => { setChannel(c); setDetails(null); }}
+            onClick={() => setChannel(c)}
             aria-pressed={channel === c}
             className={`rounded-t-md border-b-2 px-4 py-2 text-[12.5px] font-semibold transition-colors ${
               channel === c ? "border-brand text-brand" : "border-transparent text-muted-foreground hover:text-foreground"
@@ -347,7 +337,6 @@ export function MediaAssignOverlay({
             {columns.map((mediaId, index) => {
               const item = itemById(mediaId);
               const assigned = item ? campaignsOn(item.id) : [];
-              const open = details === index;
               return (
                 <section
                   key={index}
@@ -388,36 +377,22 @@ export function MediaAssignOverlay({
                             </p>
                           </div>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setDetails(open ? null : index)}
-                          aria-expanded={open}
-                          className="mt-2 flex w-full items-center justify-between rounded-sm px-1 py-1 text-[10.5px] font-semibold text-brand transition-colors hover:bg-brand-soft/70"
-                        >
-                          See file details
-                          <ChevronDown size={12} className={`transition-transform ${open ? "rotate-180" : ""}`} />
-                        </button>
-                        {open && (
-                          <div className="mt-1 rounded-md border border-border bg-background px-2.5 py-2">
-                            <ConfigRow label="File" value={item.name} />
-                            <ConfigRow label="Type" value={TYPE_LABEL[item.type]} />
-                            <ConfigRow label="Folder" value={item.folder} />
-                            <ConfigRow label="Size" value={item.size} />
-                            <ConfigRow label="Sent as" value={channel === "text" ? "MMS attachment" : "In-email image"} />
-                            <div className="mt-2 flex items-center gap-3 border-t border-border pt-2">
-                              <button type="button" onClick={() => setPicker(index)} className="text-[10.5px] font-semibold text-brand hover:underline">
-                                Change file
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setColumns((current) => current.map((v, i) => (i === index ? null : v)))}
-                                className="text-[10.5px] text-muted-foreground hover:text-destructive"
-                              >
-                                Clear column
-                              </button>
-                            </div>
-                          </div>
-                        )}
+                        <div className="mt-2 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setPicker(index)}
+                            className="flex-1 rounded-sm border border-brand/40 bg-background px-2 py-1 text-[10.5px] font-semibold text-brand transition-colors hover:bg-brand-soft"
+                          >
+                            Change file
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setColumns((current) => current.map((v, i) => (i === index ? null : v)))}
+                            className="flex-1 rounded-sm border border-border bg-background px-2 py-1 text-[10.5px] font-semibold text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                          >
+                            Clear column
+                          </button>
+                        </div>
                       </div>
                       <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-0.5">
                         {assigned.map((campaign) => (
