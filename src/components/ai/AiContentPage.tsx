@@ -391,7 +391,7 @@ function ReviewHub({
           </p>
         </div>
         <div className="flex gap-2">
-          {approved > 0 && (
+          {drafts.some((d) => d.state === "Draft") && (
             <Button variant="outline" size="sm" onClick={() => setDrafts(drafts.map((d) => (d.state === "Draft" ? { ...d, state: "Approved" } : d)))}>Approve all</Button>
           )}
           <Button size="sm" disabled={approved === 0} onClick={() => setPublishing(true)}>
