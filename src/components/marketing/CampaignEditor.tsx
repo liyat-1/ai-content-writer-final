@@ -5,6 +5,9 @@ import { EmailEditor, EmailPreview } from "./EmailEditor";
 import { PromotionSelector } from "./PromotionSelector";
 import { SmsPreview } from "@/components/editor/SmsPreview";
 import { checkContent } from "./contentChecks";
+import { AiEditPanel } from "@/components/ai/AiEditPanel";
+import { Sparkle } from "@/components/ai/Sparkle";
+import type { Copy } from "@/lib/aiWriter";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -83,6 +86,7 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
   const [panel, setPanel] = useState<Panel>(null);
   const [confirm, setConfirm] = useState<"leave" | "save" | "revert" | null>(null);
   const [promotionPicker, setPromotionPicker] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const dirty = useMemo(() => draft ? JSON.stringify(draft) !== baseline : false, [draft, baseline]);
 
   useEffect(() => {
@@ -222,6 +226,9 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
                     <div className="border-t border-border px-4 py-4">
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="ml-auto flex flex-wrap items-center gap-1.5">
+                          <Button variant="brand" size="sm" className="px-2.5" onClick={() => setAiOpen(true)}>
+                            <Sparkle size={13} />Edit with AI
+                          </Button>
                           <SectionAction icon={History} label="History" active={panel === "history"} onClick={() => setPanel((p) => (p === "history" ? null : "history"))} />
                           <SectionAction icon={HelpCircle} label="Help" active={panel === "help"} onClick={() => setPanel((p) => (p === "help" ? null : "help"))} />
                           <SectionAction icon={ShieldCheck} label="Spam check" active={panel === "spam"} onClick={() => setPanel((p) => (p === "spam" ? null : "spam"))} />
@@ -341,6 +348,27 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
         onClose={() => setPromotionPicker(false)}
         onSelect={setPromotion}
       />
+
+      {aiOpen && (
+        <AiEditPanel
+          className="z-[75]"
+          title={`${draft.name} · ${AUDIENCE_LABEL[audience]}`}
+          copy={
+            activeChannel === "email"
+              ? { kind: "email", email: { subject: variant.email.subject, preheader: variant.email.preheader, heading: variant.email.heading, body: variant.email.body, ctaLabel: variant.email.ctaLabel } }
+              : { kind: "text", text: { message: variant.text.message } }
+          }
+          onApply={(next) => {
+            setVariant(
+              next.kind === "email"
+                ? { ...variant, email: { ...variant.email, subject: next.email.subject, preheader: next.email.preheader, heading: next.email.heading, body: next.email.body, ctaLabel: next.email.ctaLabel } }
+                : { ...variant, text: { ...variant.text, message: next.text.message } },
+              activeChannel,
+            );
+          }}
+          onClose={() => setAiOpen(false)}
+        />
+      )}
 
       <AlertDialog open={confirm !== null} onOpenChange={(value) => !value && setConfirm(null)}>
         <AlertDialogContent className="border-border bg-card shadow-float">
