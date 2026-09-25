@@ -140,5 +140,5 @@
 
 - [x] Fix the content editor freezing when closing (X) or saving (confirm dialogs sat behind the editor overlay; raised them above)
 - [x] Move Change/Clear out of "See config details" onto the promo side; config shows promo details only; media columns get Change file / Clear column directly
-- [ ] Verify content editor workflows at desktop and mobile widths
-- [ ] Open and verify the Directful AI Content page (built but never tested)
+- [x] Verify content editor workflows at desktop and mobile widths
+- [x] Open and verify the Directful AI Content page (create, generate, review, approve, publish, tabs, Ask panel, mobile)
