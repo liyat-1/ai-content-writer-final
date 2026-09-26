@@ -153,8 +153,8 @@
 
 ## AI Content library refinement
 
-- [ ] Replace the attached right-side AI editor with a centered, floating workspace over a softened editor backdrop
-- [ ] Remove search, filter tabs, and manual-create controls from the Content Library; show campaigns directly
-- [ ] Add card-level Email/Text and Direct/OTA preview controls, limited to each campaign's actual channels
-- [ ] Keep all primary actions blue and make AI-authored campaign cards visibly distinct
-- [ ] Reuse the existing campaign editor structure for Content Library editing and remove the review checklist
+- [x] Replace the attached right-side AI editor with a centered, floating workspace over a softened editor backdrop
+- [x] Remove search, filter tabs, and manual-create controls from the Content Library; show campaigns directly
+- [x] Add card-level Email/Text and Direct/OTA preview controls, limited to each campaign's actual channels
+- [x] Keep all primary actions blue and make AI-authored campaign cards visibly distinct
+- [x] Reuse the existing campaign editor structure for Content Library editing and remove the review checklist
