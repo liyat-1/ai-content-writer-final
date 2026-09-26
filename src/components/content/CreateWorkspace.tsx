@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Check, Mail, MessageSquare, Plus, Search } from "lucide-react";
+import { useState } from "react";
+import { Check, Mail, MessageSquare } from "lucide-react";
 import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { Sparkle } from "@/components/ai/Sparkle";
 import {
@@ -9,42 +9,16 @@ import {
 import { AiCreateStudio } from "./AiCreateStudio";
 import { ReviewWorkspace } from "./ReviewWorkspace";
 import { AiMark, OriginMarker, StatusBadge, fill } from "./shared";
-import { publishApproved, useLibrary, type LibraryCampaign } from "@/lib/contentLibrary";
-
-const FILTERS = ["All", "Email", "Text", "AI generated", "Manually edited", "Needs review", "Approved"] as const;
-type Filter = (typeof FILTERS)[number];
-
-function matches(c: LibraryCampaign, f: Filter) {
-  switch (f) {
-    case "Email": return c.channels.includes("email");
-    case "Text": return c.channels.includes("text");
-    case "AI generated": return c.origin !== "manual";
-    case "Manually edited": return c.origin === "manual" || c.origin === "ai-edited";
-    case "Needs review": return c.status === "Needs review";
-    case "Approved": return c.status === "Approved";
-    default: return true;
-  }
-}
+import { Button } from "@/components/ui/button";
+import { publishApproved, useLibrary, type Channel, type LibraryCampaign, type Segment } from "@/lib/contentLibrary";
 
 export function CreateWorkspace() {
   const { campaigns } = useLibrary();
-  const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<Filter>("All");
   const [studio, setStudio] = useState(false);
   const [open, setOpen] = useState<{ id: string; ai: boolean } | null>(null);
-  const [manualMenu, setManualMenu] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished] = useState<number | null>(null);
   const [freshAi, setFreshAi] = useState(false);
-
-  const list = useMemo(() => {
-    const t = q.trim().toLowerCase();
-    return campaigns.filter((c) => matches(c, filter)).filter((c) => {
-      if (!t) return true;
-      const hay = [c.name, c.kind, ...c.channels, "direct", "ota", c.content.direct.text, c.content.ota.text, c.content.direct.email.body, c.content.direct.email.subject, c.content.ota.email.body].join(" ").toLowerCase();
-      return hay.includes(t);
-    });
-  }, [campaigns, q, filter]);
 
   const approved = campaigns.filter((c) => c.status === "Approved");
   const needsReview = campaigns.filter((c) => c.status === "Needs review").length;
@@ -52,36 +26,18 @@ export function CreateWorkspace() {
   return (
     <MarketingShell title="Content Library">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        {/* Header — create your way */}
-        <div className="relative overflow-hidden rounded-lg border border-border bg-card p-5 shadow-card sm:p-6">
+        <div className="relative overflow-hidden border-b border-border pb-5 pt-1 sm:pb-6">
           <div className="pointer-events-none absolute inset-0 ai-surface opacity-80" />
           <div className="pointer-events-none absolute inset-0 ai-grid opacity-50 [mask-image:linear-gradient(90deg,transparent,black)]" />
           <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-brand">Create your way</p>
-              <h2 className="mt-1 text-[26px] font-semibold tracking-tight text-card-foreground">Content Library</h2>
-              <p className="mt-1 text-[13.5px] text-muted-foreground">Create, edit and manage the content your hotel sends to guests.</p>
+            <div className="max-w-2xl">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-brand">Current guest communications</p>
+              <h2 className="font-display mt-1 text-[30px] font-semibold text-card-foreground">Your campaigns</h2>
+              <p className="mt-1 text-[13.5px] text-muted-foreground">Review what guests receive, edit it yourself, or ask Directful AI to rewrite it in place.</p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="relative">
-                <button onClick={() => setManualMenu((v) => !v)} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3.5 py-2.5 text-[13px] font-semibold text-card-foreground hover:border-foreground/30">
-                  <Plus size={15} />Create manually
-                </button>
-                {manualMenu && (
-                  <div className="absolute right-0 top-full z-20 mt-1 max-h-72 w-64 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-float">
-                    <p className="px-2.5 py-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Write content for</p>
-                    {campaigns.map((c) => (
-                      <button key={c.id} onClick={() => { setManualMenu(false); setOpen({ id: c.id, ai: false }); }} className="flex w-full items-center justify-between rounded-sm px-2.5 py-1.5 text-left text-[12.5px] hover:bg-muted">
-                        {c.name}<span className="text-[10.5px] text-muted-foreground">{c.kind.replace("Automated ", "")}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <button onClick={() => setStudio(true)} className="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-[13px] font-semibold ai-button ai-pulse">
+            <Button onClick={() => setStudio(true)} variant="brand" className="ai-pulse h-10">
                 <Sparkle size={15} className="ai-twinkle" />Create with Directful AI
-              </button>
-            </div>
+            </Button>
           </div>
         </div>
 
@@ -89,31 +45,14 @@ export function CreateWorkspace() {
           <div className="ai-rise mt-4 flex flex-wrap items-center gap-3 rounded-lg bg-card px-4 py-3 shadow-card ai-edge">
             <AiMark size={28} />
             <p className="min-w-0 flex-1 text-[13px] text-card-foreground"><strong>Your new content is in place.</strong> {needsReview} campaigns are ready for review — open one to compare, edit or refine it with AI.</p>
-            <button onClick={() => setFilter("Needs review")} className="rounded-sm border border-brand/40 px-3 py-1.5 text-[12px] font-semibold text-brand hover:bg-brand-soft">Show what needs review</button>
           </div>
         )}
 
-        {/* Search + filters */}
-        <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-center">
-          <label className="relative md:w-80">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search campaigns or content…" className="w-full rounded-md border border-border bg-card py-2 pl-9 pr-3 text-[13px] outline-none focus:border-brand" />
-          </label>
-          <div className="flex gap-1 overflow-x-auto">
-            {FILTERS.map((f) => (
-              <button key={f} onClick={() => setFilter(f)} className={`shrink-0 rounded-sm px-2.5 py-1.5 text-[12px] font-medium transition-colors ${filter === f ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
-                {f === "AI generated" && <Sparkle size={10} className="mr-1 inline" />}{f}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Library */}
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {list.map((c, i) => (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {campaigns.map((c, i) => (
             <CampaignCard key={c.id} c={c} index={i} onEdit={(ai) => setOpen({ id: c.id, ai })} />
           ))}
-          {!list.length && <p className="col-span-full py-16 text-center text-[13px] text-muted-foreground">No campaigns match “{q || filter}”.</p>}
         </div>
       </div>
 
@@ -149,7 +88,7 @@ export function CreateWorkspace() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {studio && <AiCreateStudio onClose={() => setStudio(false)} onReview={() => { setStudio(false); setFreshAi(true); setFilter("All"); }} />}
+      {studio && <AiCreateStudio onClose={() => setStudio(false)} onReview={() => { setStudio(false); setFreshAi(true); }} />}
       {open && <ReviewWorkspace id={open.id} openAi={open.ai} onClose={() => setOpen(null)} />}
     </MarketingShell>
   );
@@ -157,36 +96,49 @@ export function CreateWorkspace() {
 
 function CampaignCard({ c, index, onEdit }: { c: LibraryCampaign; index: number; onEdit: (ai: boolean) => void }) {
   const isAi = c.origin !== "manual";
-  const quote = c.channels.includes("email") ? `${c.content.direct.email.heading}. ${c.content.direct.email.body}` : c.content.direct.text;
+  const [channel, setChannel] = useState<Channel>(c.channels[0]);
+  const [segment, setSegment] = useState<Segment>("direct");
+  const current = c.content[segment];
+  const quote = channel === "email" ? `${current.email.heading}. ${current.email.body}` : current.text;
+  const tab = (active: boolean) => `rounded-sm px-2 py-1 text-[10.5px] font-semibold transition-colors ${active ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:bg-brand-soft hover:text-brand"}`;
   return (
     <article
       style={{ animationDelay: `${index * 40}ms` }}
-      className={`ai-rise group relative flex flex-col rounded-lg p-4 transition-all hover:-translate-y-0.5 hover:shadow-lift ${isAi ? "bg-card shadow-card ai-edge" : "border border-border bg-card shadow-card"}`}
+      className={`ai-rise group relative flex min-h-[20rem] flex-col overflow-hidden rounded-lg p-4 transition-all hover:-translate-y-0.5 hover:shadow-lift ${isAi ? "bg-card shadow-lift ai-edge" : "border border-border bg-card shadow-card"}`}
     >
+      {isAi && <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-brand-soft/70 [mask-image:linear-gradient(black,transparent)]" />}
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-[15px] font-semibold text-card-foreground">{c.name}</h3>
         <span className="shrink-0 text-[10.5px] font-medium text-muted-foreground">{c.kind}</span>
       </div>
-      <p className="mt-2.5 line-clamp-3 min-h-[3.9rem] text-[13px] italic leading-relaxed text-card-foreground/80">“{fill(quote)}”</p>
-      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+      <div className="relative mt-4 flex flex-wrap items-center justify-between gap-2 border-y border-border/70 py-2">
+        <div className="flex rounded-sm bg-muted/70 p-0.5">
         {c.channels.map((ch) => (
-          <span key={ch} className="inline-flex items-center gap-1 rounded-sm bg-muted px-1.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <button key={ch} onClick={() => setChannel(ch)} className={tab(channel === ch)}>
             {ch === "email" ? <Mail size={11} /> : <MessageSquare size={11} />}{ch}
-          </span>
+          </button>
         ))}
-        <span className="ml-1 text-[11px] text-muted-foreground">Direct <Check size={11} className="inline text-brand" /> · OTA <Check size={11} className="inline text-brand" /></span>
+        </div>
+        <div className="flex rounded-sm bg-muted/70 p-0.5">
+          <button onClick={() => setSegment("direct")} className={tab(segment === "direct")}>Direct</button>
+          <button onClick={() => setSegment("ota")} className={tab(segment === "ota")}>OTA</button>
+        </div>
+      </div>
+      <div className="mt-3 min-h-[6rem] rounded-md bg-background/70 p-3">
+        <p className="text-[10.5px] font-semibold uppercase tracking-wider text-brand">{channel === "email" ? "Email preview" : "Text preview"} · {segment === "direct" ? "Direct guest" : "OTA guest"}</p>
+        <p className="mt-1.5 line-clamp-3 text-[12.5px] leading-relaxed text-card-foreground/80">“{fill(quote)}”</p>
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
         <span className="flex items-center gap-2"><OriginMarker origin={c.origin} /><span className="text-[11px] text-muted-foreground">· {c.updated === "Today" ? "Updated today" : `Last edited ${c.updated}`}</span></span>
         <StatusBadge status={c.status} />
       </div>
       <div className="mt-3 flex gap-2">
-        <button onClick={() => onEdit(false)} className="flex-1 rounded-sm bg-foreground px-3 py-2 text-[12.5px] font-semibold text-background hover:opacity-90">
+        <Button onClick={() => onEdit(false)} variant="brand" size="sm" className="flex-1">
           {c.status === "Needs review" ? "Review" : "Edit content"}
-        </button>
-        <button onClick={() => onEdit(true)} className="inline-flex items-center gap-1.5 rounded-sm border border-brand/35 bg-brand-soft/60 px-3 py-2 text-[12.5px] font-semibold text-brand transition-all hover:border-brand hover:shadow-[0_0_0_3px_color-mix(in_oklch,var(--brand)_14%,transparent)]">
+        </Button>
+        <Button onClick={() => onEdit(true)} variant="outline" size="sm" className="border-brand/35 text-brand hover:bg-brand-soft">
           <Sparkle size={12} className="group-hover:ai-twinkle" />Edit with AI
-        </button>
+        </Button>
       </div>
     </article>
   );
