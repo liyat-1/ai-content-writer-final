@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Check, ChevronDown, GitCompare, RefreshCw, SlidersHorizontal, Pencil, X } from "lucide-react";
+import { ArrowUp, Check, ChevronDown, GitCompare, ImagePlus, RefreshCw, SlidersHorizontal, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sparkle } from "./Sparkle";
 import {
@@ -38,10 +38,7 @@ export function Diff({ before, after }: { before: string; after: string }) {
   );
 }
 
-/**
- * Right-side Directful AI panel. The current content stays visible on the left;
- * every AI response is a proposal the hotel applies, keeps current, or retries.
- */
+/** Floating Directful AI workspace shown over the still-visible campaign editor. */
 export function AiEditPanel({
   title,
   copy,
@@ -122,8 +119,10 @@ export function AiEditPanel({
   const chip = (active: boolean) => `rounded-full border px-2.5 py-1 text-[11.5px] transition-colors ${active ? "border-brand bg-brand-soft text-brand" : "border-border text-muted-foreground hover:border-brand/45 hover:text-foreground"}`;
 
   return (
-    <aside role="dialog" aria-label="Directful AI" className={`fixed inset-y-0 right-0 flex w-full max-w-[420px] flex-col border-l border-border bg-card shadow-float ${className}`}>
-      <header className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
+    <div className={`fixed inset-0 grid place-items-center bg-foreground/25 p-3 backdrop-blur-[3px] sm:p-6 ${className}`} onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <aside role="dialog" aria-modal="true" aria-label="Directful AI" className="ai-rise relative flex max-h-[min(82vh,46rem)] w-full max-w-[44rem] flex-col overflow-hidden rounded-xl border border-brand/25 bg-card/95 shadow-float backdrop-blur-xl">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand" />
+      <header className="flex items-start justify-between gap-3 border-b border-border px-4 py-3.5 sm:px-5">
         <div className="min-w-0">
           <p className="flex items-center gap-1.5 text-[14px] font-semibold text-card-foreground"><Sparkle className="text-brand" size={15} />Directful AI</p>
           <p className="truncate text-[11.5px] text-muted-foreground">{title} · {copy.kind === "email" ? "Email" : "Text"}</p>
@@ -131,7 +130,7 @@ export function AiEditPanel({
         <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close Directful AI"><X size={16} /></Button>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5">
         {msgs.map((m, idx) =>
           m.role === "user" ? (
             <div key={idx} className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-[12.5px] text-primary-foreground">{m.text}</div>
@@ -185,7 +184,7 @@ export function AiEditPanel({
         <div ref={endRef} />
       </div>
 
-      <div className="border-t border-border px-4 py-3">
+      <div className="border-t border-border bg-card/90 px-4 py-3 sm:px-5">
         <button onClick={() => setShowPersonalize((v) => !v)} className="mb-2 flex items-center gap-1.5 text-[12px] font-medium text-card-foreground">
           <SlidersHorizontal size={13} />Personalize<ChevronDown size={13} className={`transition-transform ${showPersonalize ? "rotate-180" : ""}`} />
         </button>
@@ -209,7 +208,7 @@ export function AiEditPanel({
             <button key={a} className={chip(false)} onClick={() => ask(a)}>{a}</button>
           ))}
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); ask(input); }} className="relative">
+        <form onSubmit={(e) => { e.preventDefault(); ask(input); }} className="rounded-lg border border-brand/30 bg-background p-2 shadow-card focus-within:border-brand">
           <textarea
             ref={inputRef}
             value={input}
@@ -217,12 +216,16 @@ export function AiEditPanel({
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(input); } }}
             rows={2}
             placeholder="Ask Directful AI to refine this content…"
-            className="w-full resize-none rounded-md border border-input bg-background py-2 pl-3 pr-11 text-[13px] outline-none focus:border-brand"
+            className="min-h-16 w-full resize-none bg-transparent px-2 py-1.5 text-[13px] outline-none"
           />
-          <Button type="submit" size="icon" variant="brand" className="absolute bottom-2.5 right-2 size-7" disabled={!input.trim()} aria-label="Send"><ArrowUp size={14} /></Button>
+          <div className="mt-1 flex items-center justify-between gap-2 border-t border-border/70 pt-2">
+            <Button type="button" size="sm" variant="ghost" title="Add media from your library"><ImagePlus size={14} />Add media</Button>
+            <Button type="submit" size="icon" variant="brand" className="size-8" disabled={!input.trim()} aria-label="Send"><ArrowUp size={14} /></Button>
+          </div>
         </form>
         <p className="mt-1.5 text-[10.5px] text-muted-foreground">Directful AI only suggests content — nothing is published or replaced until you apply it.</p>
       </div>
     </aside>
+    </div>
   );
 }
