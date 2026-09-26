@@ -274,3 +274,132 @@ export function generateAll(ideas: Idea[], direction: Direction, range: string) 
 }
 
 export const IMAGE_LABEL: Record<string, string> = { lobby: "Lobby arrival", rooftop: "Rooftop at dusk", room: "Fall room with city view", suite: "Suite detail", courtyard: "Courtyard" };
+
+/* ------------------------ Library meta & analytics ------------------------ */
+
+/** Which Marketing-editor campaign each library campaign opens. */
+export const EDITOR_ID: Record<string, string> = {
+  alv: "after-last-visit", m3: "lost-3", m6: "lost-6", m9: "lost-9", m12: "lost-12", m15: "lost-15", m15p: "lost-15-plus",
+  conf: "just-booked", pre: "before-arrival", welcome: "during-stay", mid: "during-stay", post: "post-checkout",
+};
+
+/** Months (0-11) each campaign's current content covers. */
+export const ACTIVE_MONTHS: Record<string, number[]> = {
+  alv: [8, 9, 10], m3: [8, 9, 10, 11], m6: [9, 10, 11], m9: [10, 11], m12: [8, 9, 10, 11], m15: [9, 10], m15p: [10, 11],
+  conf: [8, 9, 10, 11], pre: [8, 9, 10, 11], welcome: [8, 9, 10, 11], mid: [8, 9, 10, 11], post: [8, 9, 10, 11],
+};
+
+export type Attachment = { id: string; kind: "media" | "upload" | "sheet" | "doc"; name: string; image?: string; note?: string };
+
+export const MEDIA_LIBRARY: Attachment[] = [
+  { id: "ml-rooftop", kind: "media", name: "Rooftop at dusk", image: "rooftop" },
+  { id: "ml-room", kind: "media", name: "Fall room, city view", image: "room" },
+  { id: "ml-lobby", kind: "media", name: "Lobby arrival", image: "lobby" },
+  { id: "ml-suite", kind: "media", name: "Suite detail", image: "suite" },
+  { id: "ml-court", kind: "media", name: "Courtyard", image: "courtyard" },
+];
+
+/** Real-looking event imagery (Wikimedia Commons, free to use). */
+export const EVENT_IMAGE: Record<string, string> = {
+  "summer-end": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Times_Square%2C_New_York_City_%28HDR%29.jpg/640px-Times_Square%2C_New_York_City_%28HDR%29.jpg",
+  autumn: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Central_Park_in_autumn.jpg/640px-Central_Park_in_autumn.jpg",
+  winter: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Rockefeller_Center_Christmas_Tree_2012.jpg/480px-Rockefeller_Center_Christmas_Tree_2012.jpg",
+  halloween: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Village_Halloween_Parade_2012.jpg/640px-Village_Halloween_Parade_2012.jpg",
+  thanksgiving: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Macy%27s_Thanksgiving_Day_Parade_2011.jpg/640px-Macy%27s_Thanksgiving_Day_Parade_2011.jpg",
+  holidays: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Rockefeller_Center_Christmas_Tree_2012.jpg/480px-Rockefeller_Center_Christmas_Tree_2012.jpg",
+  marathon: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/NYC_Marathon_Verrazano_Bridge.jpg/640px-NYC_Marathon_Verrazano_Bridge.jpg",
+  festival: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Times_Square%2C_New_York_City_%28HDR%29.jpg/640px-Times_Square%2C_New_York_City_%28HDR%29.jpg",
+};
+
+/** Parse "oct to dec", "next 2 months", "halloween", "november" into a month range. */
+export function parseTimeframe(text: string, now = 8): { s: number; e: number } | null {
+  const t = text.toLowerCase();
+  const found: number[] = [];
+  const full = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+  full.forEach((m, i) => { const re = new RegExp(`\\b(${m}|${m.slice(0, 3)})\\b`); const idx = t.search(re); if (idx >= 0) found.push(i * 1000 + idx); });
+  const months = found.sort((a, b) => (a % 1000) - (b % 1000)).map((x) => Math.floor(x / 1000));
+  if (months.length) { const s = months[0], e = months[months.length - 1]; return { s: Math.min(s, e), e: Math.max(s, e) }; }
+  const n = t.match(/next\s+(\d+|one|two|three|four|five|six)\s+months?/);
+  if (n) { const map: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 }; const k = Number(n[1]) || map[n[1]]; return { s: now, e: Math.min(11, now + k) }; }
+  if (/next month/.test(t)) return { s: now + 1, e: now + 1 };
+  if (/this month/.test(t)) return { s: now, e: now };
+  if (/halloween/.test(t)) return { s: 9, e: 9 };
+  if (/thanksgiving/.test(t)) return { s: 10, e: 10 };
+  if (/christmas|holiday season|holidays/.test(t)) return { s: 11, e: 11 };
+  if (/fall|autumn/.test(t)) return { s: 8, e: 10 };
+  if (/winter/.test(t)) return { s: 11, e: 11 };
+  if (/rest of (the )?year|end of (the )?year/.test(t)) return { s: now, e: 11 };
+  return null;
+}
+
+/** Rewrite one campaign in place for the Edit-with-AI overlay. */
+export function aiRewrite(id: string, opts: { segments: Segment[]; channels: Channel[]; prompt: string; attachments: Attachment[] }) {
+  const p = opts.prompt.toLowerCase();
+  const premium = /premium|luxur|elegant/.test(p);
+  const short = /short|concise|brief/.test(p);
+  const halloween = /halloween/.test(p);
+  const media = opts.attachments.find((a) => a.image);
+  set((s) => ({
+    ...s,
+    campaigns: s.campaigns.map((c) => {
+      if (c.id !== id) return c;
+      const content = clone(c.content);
+      opts.segments.forEach((sg) => {
+        const tail = sg === "direct" ? "Book direct — your best rate is waiting." : "Book with us directly next time for perks travel sites can't offer.";
+        const hook = halloween ? "🎃 Midtown gets spooky this October" : premium ? "A quieter, more refined Times Square" : "Fall in New York is calling";
+        if (opts.channels.includes("email") && c.channels.includes("email")) {
+          content[sg].email = {
+            subject: `${hook}, {first_name}`,
+            preheader: premium ? "Crisp evenings, rooftop views and a room made for you." : "Crisp evenings, rooftop lights and your room above the city.",
+            heading: hook,
+            body: short ? `${c.goal}. ${tail}` : `${c.goal}. Picture crisp evenings, the rooftop glowing over Broadway and a room right in the heart of it all. ${tail}`,
+            cta: sg === "direct" ? "Plan my return" : "See direct rates",
+          };
+        }
+        if (opts.channels.includes("text") && c.channels.includes("text")) {
+          content[sg].text = `Hi {first_name}! ${hook} at Holiday Inn Times Square. ${sg === "direct" ? "Best rate direct:" : "Book direct next time:"} {booking_link}`;
+        }
+      });
+      return {
+        ...c, content, origin: "ai-edited" as Origin, status: "Needs review" as Status, updated: "Today", version: c.version + 1,
+        image: media?.image ?? c.image,
+        why: { template: "Kept your layout — only the words changed.", subject: `Rewritten around "${opts.prompt.slice(0, 60)}".`, image: media ? `Using your ${media.name} photo.` : "Kept your current image.", text: short ? "Trimmed to one line and one link." : "One invitation, one link.", context: [opts.segments.map((x) => SEGMENT_LABEL[x]).join(" + "), opts.channels.join(" + "), ...opts.attachments.map((a) => a.name)] },
+      };
+    }),
+    versions: [{ campaignId: id, v: (s.campaigns.find((c) => c.id === id)?.version ?? 0) + 1, label: "Edited with Directful AI", by: "Directful AI", when: "Today" }, ...s.versions],
+  }));
+}
+
+/* Performance — sample figures, Sep–Nov 2026 vs 2025. */
+export type MonthPerf = { m: number; sent: number; opens: number; clicks: number; bookings: number; revenue: number; ly: { clicks: number; bookings: number; revenue: number } };
+export const MONTH_PERF: MonthPerf[] = [
+  { m: 6, sent: 4120, opens: 2010, clicks: 262, bookings: 31, revenue: 18400, ly: { clicks: 240, bookings: 27, revenue: 15900 } },
+  { m: 7, sent: 4380, opens: 2190, clicks: 281, bookings: 34, revenue: 20100, ly: { clicks: 251, bookings: 30, revenue: 17300 } },
+  { m: 8, sent: 4610, opens: 2410, clicks: 331, bookings: 42, revenue: 25200, ly: { clicks: 270, bookings: 33, revenue: 19100 } },
+  { m: 9, sent: 4790, opens: 2520, clicks: 356, bookings: 46, revenue: 27900, ly: { clicks: 301, bookings: 38, revenue: 22400 } },
+  { m: 10, sent: 4950, opens: 2480, clicks: 318, bookings: 39, revenue: 24300, ly: { clicks: 322, bookings: 41, revenue: 25800 } },
+];
+
+export const CAMPAIGN_PERF: Record<string, { email: number; text: number; direct: number; ota: number; bookings: number; ly: number }> = {
+  alv: { email: 7.1, text: 9.4, direct: 8.8, ota: 6.2, bookings: 11, ly: 8 },
+  m3: { email: 8.4, text: 10.2, direct: 9.6, ota: 7.9, bookings: 14, ly: 9 },
+  m6: { email: 6.0, text: 7.1, direct: 6.8, ota: 5.4, bookings: 6, ly: 6 },
+  m9: { email: 5.2, text: 6.0, direct: 5.9, ota: 4.7, bookings: 4, ly: 5 },
+  m12: { email: 4.8, text: 5.5, direct: 5.3, ota: 4.2, bookings: 5, ly: 4 },
+  m15: { email: 3.3, text: 4.1, direct: 3.8, ota: 2.9, bookings: 2, ly: 3 },
+  m15p: { email: 2.6, text: 3.2, direct: 3.0, ota: 2.3, bookings: 1, ly: 2 },
+  conf: { email: 61.2, text: 0, direct: 63.0, ota: 58.9, bookings: 0, ly: 0 },
+  pre: { email: 44.8, text: 38.2, direct: 46.1, ota: 41.0, bookings: 0, ly: 0 },
+  welcome: { email: 0, text: 22.4, direct: 23.1, ota: 21.2, bookings: 0, ly: 0 },
+  mid: { email: 0, text: 18.9, direct: 19.5, ota: 17.8, bookings: 0, ly: 0 },
+  post: { email: 12.3, text: 14.0, direct: 13.1, ota: 11.6, bookings: 0, ly: 0 },
+};
+
+/* Published versions with adoption across the portfolio. */
+export type PublishedVersion = { id: string; name: string; v: string; when: string; month: number; from: number; to: number; by: string; ai: boolean; campaigns: string[]; aiProps: number; ownProps: number; totalProps: number; clickRate: number; live: boolean; note: string };
+export const PUBLISHED_VERSIONS: PublishedVersion[] = [
+  { id: "pv4", name: "Fall 2026 · Holiday season", v: "v4", when: "Sep 22, 2026", month: 8, from: 10, to: 11, by: "Directful AI", ai: true, campaigns: ["alv", "m3", "m6", "m9", "m12"], aiProps: 38, ownProps: 9, totalProps: 52, clickRate: 7.4, live: false, note: "Scheduled — goes live Nov 1" },
+  { id: "pv3", name: "Fall 2026 · Autumn in NYC", v: "v3", when: "Sep 2, 2026", month: 8, from: 8, to: 10, by: "Directful AI", ai: true, campaigns: ["alv", "m3", "m6", "m9", "m12", "m15", "m15p", "conf", "pre", "post"], aiProps: 41, ownProps: 11, totalProps: 52, clickRate: 6.8, live: true, note: "Live now" },
+  { id: "pv2", name: "Summer 2026 · Rooftop season", v: "v2", when: "Jun 12, 2026", month: 5, from: 5, to: 7, by: "Maria Chen", ai: false, campaigns: ["alv", "m3", "m6", "m12", "conf", "pre", "welcome", "mid", "post"], aiProps: 29, ownProps: 20, totalProps: 49, clickRate: 6.1, live: false, note: "Replaced by v3" },
+  { id: "pv1", name: "Spring 2026 · Original content", v: "v1", when: "Mar 3, 2026", month: 2, from: 2, to: 4, by: "Maria Chen", ai: false, campaigns: ["alv", "m3", "m6", "m9", "m12", "m15", "m15p", "conf", "pre", "welcome", "mid", "post"], aiProps: 18, ownProps: 28, totalProps: 46, clickRate: 5.2, live: false, note: "Archived" },
+];
