@@ -20,7 +20,7 @@ const input = "w-full rounded-sm border border-border bg-background px-3 py-2 te
 
 /**
  * The editor hotels already know — content, live preview and a Content
- * Intelligence column — with Directful AI as one more editing tool.
+ * Insight column — with Directful AI as one more editing tool.
  */
 export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; openAi?: boolean; onClose: () => void }) {
   const { campaigns } = useLibrary();
