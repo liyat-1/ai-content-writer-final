@@ -6,6 +6,10 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { CampaignCard as MkCard } from "@/components/marketing/CampaignCard";
+import { CampaignEditor } from "@/components/marketing/CampaignEditor";
+import { TestCampaignDialog } from "@/components/marketing/MarketingDialogs";
+import { defaultVariant, mutate, useMarketing } from "@/lib/marketing";
 import { AiCreateStudio } from "./AiCreateStudio";
 import { ReviewWorkspace } from "./ReviewWorkspace";
 import { AiMark, OriginMarker, StatusBadge, fill } from "./shared";
@@ -19,6 +23,10 @@ export function CreateWorkspace() {
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished] = useState<number | null>(null);
   const [freshAi, setFreshAi] = useState(false);
+  const mk = useMarketing();
+  const invites = mk.campaigns.filter((c) => c.group === "invites");
+  const [editing, setEditing] = useState<string | null>(null);
+  const [testing, setTesting] = useState<string | null>(null);
 
   const approved = campaigns.filter((c) => c.status === "Approved");
   const needsReview = campaigns.filter((c) => c.status === "Needs review").length;
@@ -48,10 +56,17 @@ export function CreateWorkspace() {
           </div>
         )}
 
-        {/* Library */}
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {campaigns.map((c, i) => (
-            <CampaignCard key={c.id} c={c} index={i} onEdit={(ai) => setOpen({ id: c.id, ai })} />
+        {/* Library — same cards and editor as Automated Invites */}
+        <div className="mt-5 grid gap-4 pb-16 md:grid-cols-2 xl:grid-cols-3">
+          {invites.map((campaign) => (
+            <MkCard
+              key={campaign.id}
+              campaign={campaign}
+              onToggle={(value) => mutate((d) => { const it = d.campaigns.find((x) => x.id === campaign.id); if (it) it.enabled = value; })}
+              onEdit={() => setEditing(campaign.id)}
+              onTest={() => setTesting(campaign.id)}
+              onRevert={() => mutate((d) => { const it = d.campaigns.find((x) => x.id === campaign.id); if (it) { it.variants.direct = defaultVariant(it.id, "direct"); it.variants.ota = defaultVariant(it.id, "ota"); } })}
+            />
           ))}
         </div>
       </div>
@@ -89,57 +104,10 @@ export function CreateWorkspace() {
       </AlertDialog>
 
       {studio && <AiCreateStudio onClose={() => setStudio(false)} onReview={() => { setStudio(false); setFreshAi(true); }} />}
+      {editing && <CampaignEditor id={editing} onClose={() => setEditing(null)} />}
+      <TestCampaignDialog campaign={mk.campaigns.find((c) => c.id === testing) ?? null} open={Boolean(testing)} onClose={() => setTesting(null)} />
       {open && <ReviewWorkspace id={open.id} openAi={open.ai} onClose={() => setOpen(null)} />}
     </MarketingShell>
   );
 }
 
-function CampaignCard({ c, index, onEdit }: { c: LibraryCampaign; index: number; onEdit: (ai: boolean) => void }) {
-  const isAi = c.origin !== "manual";
-  const [channel, setChannel] = useState<Channel>(c.channels[0]);
-  const [segment, setSegment] = useState<Segment>("direct");
-  const current = c.content[segment];
-  const quote = channel === "email" ? `${current.email.heading}. ${current.email.body}` : current.text;
-  const tab = (active: boolean) => `rounded-sm px-2 py-1 text-[10.5px] font-semibold transition-colors ${active ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:bg-brand-soft hover:text-brand"}`;
-  return (
-    <article
-      style={{ animationDelay: `${index * 40}ms` }}
-      className={`ai-rise group relative flex min-h-[20rem] flex-col overflow-hidden rounded-lg p-4 transition-all hover:-translate-y-0.5 hover:shadow-lift ${isAi ? "bg-card shadow-lift ai-edge" : "border border-border bg-card shadow-card"}`}
-    >
-      {isAi && <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-brand-soft/70 [mask-image:linear-gradient(black,transparent)]" />}
-      <div className="flex items-start justify-between gap-2">
-        <h3 className="text-[15px] font-semibold text-card-foreground">{c.name}</h3>
-        <span className="shrink-0 text-[10.5px] font-medium text-muted-foreground">{c.kind}</span>
-      </div>
-      <div className="relative mt-4 flex flex-wrap items-center justify-between gap-2 border-y border-border/70 py-2">
-        <div className="flex rounded-sm bg-muted/70 p-0.5">
-        {c.channels.map((ch) => (
-          <button key={ch} onClick={() => setChannel(ch)} className={tab(channel === ch)}>
-            {ch === "email" ? <Mail size={11} /> : <MessageSquare size={11} />}{ch}
-          </button>
-        ))}
-        </div>
-        <div className="flex rounded-sm bg-muted/70 p-0.5">
-          <button onClick={() => setSegment("direct")} className={tab(segment === "direct")}>Direct</button>
-          <button onClick={() => setSegment("ota")} className={tab(segment === "ota")}>OTA</button>
-        </div>
-      </div>
-      <div className="mt-3 min-h-[6rem] rounded-md bg-background/70 p-3">
-        <p className="text-[10.5px] font-semibold uppercase tracking-wider text-brand">{channel === "email" ? "Email preview" : "Text preview"} · {segment === "direct" ? "Direct guest" : "OTA guest"}</p>
-        <p className="mt-1.5 line-clamp-3 text-[12.5px] leading-relaxed text-card-foreground/80">“{fill(quote)}”</p>
-      </div>
-      <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
-        <span className="flex items-center gap-2"><OriginMarker origin={c.origin} /><span className="text-[11px] text-muted-foreground">· {c.updated === "Today" ? "Updated today" : `Last edited ${c.updated}`}</span></span>
-        <StatusBadge status={c.status} />
-      </div>
-      <div className="mt-3 flex gap-2">
-        <Button onClick={() => onEdit(false)} variant="brand" size="sm" className="flex-1">
-          {c.status === "Needs review" ? "Review" : "Edit content"}
-        </Button>
-        <Button onClick={() => onEdit(true)} variant="outline" size="sm" className="border-brand/35 text-brand hover:bg-brand-soft">
-          <Sparkle size={12} className="group-hover:ai-twinkle" />Edit with AI
-        </Button>
-      </div>
-    </article>
-  );
-}
