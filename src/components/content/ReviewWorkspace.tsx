@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Check, HelpCircle, ShieldCheck, X } from "lucide-react";
+import { useState } from "react";
+import { HelpCircle, ShieldCheck, X } from "lucide-react";
 import { Sparkle } from "@/components/ai/Sparkle";
 import { AiEditPanel } from "@/components/ai/AiEditPanel";
 import { SmsPreview } from "@/components/editor/SmsPreview";
@@ -39,11 +39,6 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
   const dirty = JSON.stringify(draft.content) !== baseline;
   const saved = campaigns.find((x) => x.id === id)!;
 
-  // Viewing a segment/channel counts as reviewing it.
-  const markReviewed = (s: Segment, ch: Channel) =>
-    setDraft((d) => (d.content[s].reviewed[ch] ? d : { ...d, content: { ...d.content, [s]: { ...d.content[s], reviewed: { ...d.content[s].reviewed, [ch]: true } } } }));
-  useEffect(() => markReviewed(segment, channel), [segment, channel]); // eslint-disable-line react-hooks/exhaustive-deps
-
   const edit = (fn: (s: LibraryCampaign["content"][Segment]) => void) =>
     setDraft((d) => { const n = clone(d); fn(n.content[segment]); return n; });
 
@@ -68,17 +63,7 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
   };
 
   const spam = checkContent(channel === "text" ? [{ label: "message", text: c.text }] : [{ label: "subject", text: c.email.subject }, { label: "body", text: c.email.body }]);
-  const spamOk = spam.every((s) => s.status !== "warn");
-  const segs: Segment[] = ["direct", "ota"];
-  const checklist = [
-    ...(draft.channels.includes("email") ? [["Email reviewed", segs.every((s) => draft.content[s].reviewed.email)]] : []),
-    ...(draft.channels.includes("text") ? [["Text reviewed", segs.every((s) => draft.content[s].reviewed.text)]] : []),
-    ["Direct guest content reviewed", draft.channels.every((ch) => draft.content.direct.reviewed[ch])],
-    ["OTA content reviewed", draft.channels.every((ch) => draft.content.ota.reviewed[ch])],
-    ["Spam check passed", spamOk],
-    ["Content saved", !dirty],
-  ] as [string, boolean][];
-  const allDone = checklist.every(([, v]) => v);
+
 
   const tool = (on: boolean) => `inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1.5 text-[12px] font-medium transition-colors ${on ? "border-brand bg-brand-soft text-brand" : "border-border text-muted-foreground hover:text-foreground"}`;
 
@@ -171,7 +156,7 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
             {/* Column 3 — Content Intelligence */}
             <aside className="min-w-0 space-y-3">
               <div className="rounded-lg bg-card p-4 shadow-card ai-edge">
-                <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand"><Sparkle size={11} />Content intelligence</p>
+                <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand"><Sparkle size={11} />Content insight</p>
                 <div className="mt-2"><OriginMarker origin={saved.origin} /></div>
                 {draft.why ? (
                   <dl className="mt-3 space-y-2.5 text-[12px]">
