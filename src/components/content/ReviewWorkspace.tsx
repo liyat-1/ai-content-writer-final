@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Check, HelpCircle, ShieldCheck, X } from "lucide-react";
+import { useState } from "react";
+import { HelpCircle, ShieldCheck, X } from "lucide-react";
 import { Sparkle } from "@/components/ai/Sparkle";
 import { AiEditPanel } from "@/components/ai/AiEditPanel";
 import { SmsPreview } from "@/components/editor/SmsPreview";
@@ -20,7 +20,7 @@ const input = "w-full rounded-sm border border-border bg-background px-3 py-2 te
 
 /**
  * The editor hotels already know — content, live preview and a Content
- * Intelligence column — with Directful AI as one more editing tool.
+ * Insight column — with Directful AI as one more editing tool.
  */
 export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; openAi?: boolean; onClose: () => void }) {
   const { campaigns } = useLibrary();
@@ -38,11 +38,6 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
   const c = draft.content[segment];
   const dirty = JSON.stringify(draft.content) !== baseline;
   const saved = campaigns.find((x) => x.id === id)!;
-
-  // Viewing a segment/channel counts as reviewing it.
-  const markReviewed = (s: Segment, ch: Channel) =>
-    setDraft((d) => (d.content[s].reviewed[ch] ? d : { ...d, content: { ...d.content, [s]: { ...d.content[s], reviewed: { ...d.content[s].reviewed, [ch]: true } } } }));
-  useEffect(() => markReviewed(segment, channel), [segment, channel]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const edit = (fn: (s: LibraryCampaign["content"][Segment]) => void) =>
     setDraft((d) => { const n = clone(d); fn(n.content[segment]); return n; });
@@ -68,17 +63,7 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
   };
 
   const spam = checkContent(channel === "text" ? [{ label: "message", text: c.text }] : [{ label: "subject", text: c.email.subject }, { label: "body", text: c.email.body }]);
-  const spamOk = spam.every((s) => s.status !== "warn");
-  const segs: Segment[] = ["direct", "ota"];
-  const checklist = [
-    ...(draft.channels.includes("email") ? [["Email reviewed", segs.every((s) => draft.content[s].reviewed.email)]] : []),
-    ...(draft.channels.includes("text") ? [["Text reviewed", segs.every((s) => draft.content[s].reviewed.text)]] : []),
-    ["Direct guest content reviewed", draft.channels.every((ch) => draft.content.direct.reviewed[ch])],
-    ["OTA content reviewed", draft.channels.every((ch) => draft.content.ota.reviewed[ch])],
-    ["Spam check passed", spamOk],
-    ["Content saved", !dirty],
-  ] as [string, boolean][];
-  const allDone = checklist.every(([, v]) => v);
+
 
   const tool = (on: boolean) => `inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1.5 text-[12px] font-medium transition-colors ${on ? "border-brand bg-brand-soft text-brand" : "border-border text-muted-foreground hover:text-foreground"}`;
 
@@ -100,7 +85,7 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
           <label className="flex items-center gap-2 text-[11.5px] font-medium text-muted-foreground">
             Guest segment
             <select value={segment} onChange={(e) => setSegment(e.target.value as Segment)} className="rounded-sm border border-border bg-background px-2 py-1.5 text-[12.5px] font-semibold text-card-foreground">
-              {segs.map((s) => <option key={s} value={s}>{SEGMENT_LABEL[s]}</option>)}
+              {(["direct", "ota"] as Segment[]).map((s) => <option key={s} value={s}>{SEGMENT_LABEL[s]}</option>)}
             </select>
           </label>
           <div className="flex gap-0.5 rounded-sm bg-muted p-0.5">
@@ -171,7 +156,7 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
             {/* Column 3 — Content Intelligence */}
             <aside className="min-w-0 space-y-3">
               <div className="rounded-lg bg-card p-4 shadow-card ai-edge">
-                <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand"><Sparkle size={11} />Content intelligence</p>
+                <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand"><Sparkle size={11} />Content insight</p>
                 <div className="mt-2"><OriginMarker origin={saved.origin} /></div>
                 {draft.why ? (
                   <dl className="mt-3 space-y-2.5 text-[12px]">
@@ -198,22 +183,13 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
               </div>
 
               <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{allDone ? "Review complete" : "Review checklist"}</p>
-                <ul className="mt-2.5 space-y-1.5">
-                  {checklist.map(([l, ok]) => (
-                    <li key={l} className={`flex items-center gap-2 text-[12px] ${ok ? "text-card-foreground" : "text-muted-foreground"}`}>
-                      <span className={`grid size-4 place-items-center rounded-sm ${ok ? "bg-brand text-brand-foreground" : "border border-border"}`}>{ok && <Check size={10} />}</span>{l}
-                    </li>
-                  ))}
-                </ul>
                 <button
-                  disabled={!allDone || saved.status === "Approved" || saved.status === "Published"}
+                  disabled={saved.status === "Approved" || saved.status === "Published"}
                   onClick={() => approveCampaign(id)}
-                  className="mt-3 w-full rounded-sm bg-brand px-3 py-2 text-[12.5px] font-semibold text-brand-foreground disabled:opacity-40"
+                  className="w-full rounded-sm bg-brand px-3 py-2 text-[12.5px] font-semibold text-brand-foreground disabled:opacity-40"
                 >
                   {saved.status === "Approved" ? "Approved ✓" : saved.status === "Published" ? "Published" : "Approve content"}
                 </button>
-                {!allDone && <p className="mt-1.5 text-[10.5px] text-muted-foreground">Check both segments and channels, then save to approve.</p>}
               </div>
             </aside>
           </div>
