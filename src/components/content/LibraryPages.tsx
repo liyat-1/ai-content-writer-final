@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { Sparkle } from "@/components/ai/Sparkle";
 import { useLibrary } from "@/lib/contentLibrary";
@@ -16,28 +15,6 @@ function Page({ title, sub, children }: { title: string; sub: string; children: 
   );
 }
 const card = "rounded-lg border border-border bg-card shadow-card";
-
-export function PublishedPage() {
-  const { publications, campaigns } = useLibrary();
-  const name = (id: string) => campaigns.find((c) => c.id === id)?.name ?? id;
-  return (
-    <Page title="Published" sub="What was published, when, and exactly which campaigns, versions, segments and channels went live.">
-      <div className="space-y-3">
-        {publications.map((p, i) => (
-          <div key={p.id} className={`${card} p-4`}>
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-[15px] font-semibold text-card-foreground">{p.name}</h3>
-              {i === 0 && <span className="rounded-sm bg-brand px-1.5 py-0.5 text-[10.5px] font-semibold text-brand-foreground">Live now</span>}
-              <span className="ml-auto text-[12px] text-muted-foreground">Published {p.when}</span>
-            </div>
-            <p className="mt-1 text-[12px] text-muted-foreground">{p.campaigns.length} campaigns · {p.pieces} content pieces · {p.channels} · {p.segments} · versions {p.version}</p>
-            <div className="mt-3 flex flex-wrap gap-1.5">{p.campaigns.map((id) => <span key={id} className="rounded-sm bg-muted px-2 py-0.5 text-[11.5px] text-card-foreground">{name(id)}</span>)}</div>
-          </div>
-        ))}
-      </div>
-    </Page>
-  );
-}
 
 export function HistoryPage() {
   const { campaigns, versions } = useLibrary();
@@ -65,37 +42,6 @@ export function HistoryPage() {
             </li>
           ))}
         </ol>
-      </div>
-    </Page>
-  );
-}
-
-const PERF = [
-  ["After Last Visit", 7.8, 6], ["3 Months", 8.2, 21], ["6 Months", 6.1, 4], ["9 Months", 5.4, -3], ["12 Months", 4.9, 2],
-  ["15 Months", 3.4, -8], ["15 Months+", 2.7, -12], ["Booking Confirmation", 61.2, 1], ["Pre-Arrival", 44.8, 5], ["Post-Stay Thank You", 12.3, 3],
-] as const;
-
-export function PerformancePage() {
-  return (
-    <Page title="Performance" sub="How your published content performs. Sample figures for Holiday Inn Times Square.">
-      <div className="mb-4 grid gap-3 sm:grid-cols-3">
-        {[["Click rate", "6.8%", "+0.7 pts vs Summer"], ["Bookings from content", "42", "+7 vs Summer"], ["Best performer", "3 Months", "Seasonal subject line"]].map(([k, v, s]) => (
-          <div key={k} className={`${card} p-4`}><p className="text-[11.5px] text-muted-foreground">{k}</p><p className="mt-1 text-[22px] font-semibold text-card-foreground">{v}</p><p className="text-[11.5px] text-brand">{s}</p></div>
-        ))}
-      </div>
-      <div className={`${card} overflow-x-auto`}>
-        <table className="w-full text-[12.5px]">
-          <thead><tr className="border-b border-border text-left text-muted-foreground"><th className="px-4 py-2.5 font-medium">Campaign</th><th className="px-4 py-2.5 font-medium">Click rate</th><th className="px-4 py-2.5 font-medium">vs previous version</th></tr></thead>
-          <tbody>
-            {PERF.map(([n, r, d]) => (
-              <tr key={n} className="border-b border-border last:border-0">
-                <td className="px-4 py-2.5 font-semibold text-card-foreground">{n}</td>
-                <td className="px-4 py-2.5">{r}%</td>
-                <td className={`px-4 py-2.5 ${d >= 0 ? "text-brand" : "text-destructive"}`}>{d >= 0 ? <ArrowUpRight size={13} className="inline" /> : <ArrowDownRight size={13} className="inline" />} {Math.abs(d)}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </Page>
   );
@@ -145,3 +91,5 @@ export function SettingsPage() {
     </Page>
   );
 }
+
+export { PublishedPage, PerformancePage } from "./InsightPages";
