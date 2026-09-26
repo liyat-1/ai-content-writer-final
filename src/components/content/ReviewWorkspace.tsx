@@ -183,22 +183,13 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
               </div>
 
               <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{allDone ? "Review complete" : "Review checklist"}</p>
-                <ul className="mt-2.5 space-y-1.5">
-                  {checklist.map(([l, ok]) => (
-                    <li key={l} className={`flex items-center gap-2 text-[12px] ${ok ? "text-card-foreground" : "text-muted-foreground"}`}>
-                      <span className={`grid size-4 place-items-center rounded-sm ${ok ? "bg-brand text-brand-foreground" : "border border-border"}`}>{ok && <Check size={10} />}</span>{l}
-                    </li>
-                  ))}
-                </ul>
                 <button
-                  disabled={!allDone || saved.status === "Approved" || saved.status === "Published"}
+                  disabled={saved.status === "Approved" || saved.status === "Published"}
                   onClick={() => approveCampaign(id)}
-                  className="mt-3 w-full rounded-sm bg-brand px-3 py-2 text-[12.5px] font-semibold text-brand-foreground disabled:opacity-40"
+                  className="w-full rounded-sm bg-brand px-3 py-2 text-[12.5px] font-semibold text-brand-foreground disabled:opacity-40"
                 >
                   {saved.status === "Approved" ? "Approved ✓" : saved.status === "Published" ? "Published" : "Approve content"}
                 </button>
-                {!allDone && <p className="mt-1.5 text-[10.5px] text-muted-foreground">Check both segments and channels, then save to approve.</p>}
               </div>
             </aside>
           </div>
