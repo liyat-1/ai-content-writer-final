@@ -149,7 +149,7 @@
 - [x] Create workspace: 12 campaign cards with content preview, search, filters, Create manually / Create with Directful AI
 - [x] Immersive AI creation: timeframe first, discoveries, direction chat, plan, live generation, "Your content is ready"
 - [x] Three-column review editor with segment switch, Edit with AI, intelligence panel, checklist, approve, publish
-- [ ] Put "Edit with AI" inside the existing Marketing campaign editor too (not yet connected)
+- [x] Put "Edit with AI" inside the existing Marketing campaign editor too
 
 ## AI Content library refinement
 
