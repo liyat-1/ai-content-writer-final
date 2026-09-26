@@ -6,6 +6,10 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { CampaignCard as MkCard } from "@/components/marketing/CampaignCard";
+import { CampaignEditor } from "@/components/marketing/CampaignEditor";
+import { TestCampaignDialog } from "@/components/marketing/MarketingDialogs";
+import { defaultVariant, mutate, useMarketing } from "@/lib/marketing";
 import { AiCreateStudio } from "./AiCreateStudio";
 import { ReviewWorkspace } from "./ReviewWorkspace";
 import { AiMark, OriginMarker, StatusBadge, fill } from "./shared";
@@ -19,6 +23,10 @@ export function CreateWorkspace() {
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished] = useState<number | null>(null);
   const [freshAi, setFreshAi] = useState(false);
+  const mk = useMarketing();
+  const invites = mk.campaigns.filter((c) => c.group === "invites");
+  const [editing, setEditing] = useState<string | null>(null);
+  const [testing, setTesting] = useState<string | null>(null);
 
   const approved = campaigns.filter((c) => c.status === "Approved");
   const needsReview = campaigns.filter((c) => c.status === "Needs review").length;
@@ -48,10 +56,17 @@ export function CreateWorkspace() {
           </div>
         )}
 
-        {/* Library */}
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {campaigns.map((c, i) => (
-            <CampaignCard key={c.id} c={c} index={i} onEdit={(ai) => setOpen({ id: c.id, ai })} />
+        {/* Library — same cards and editor as Automated Invites */}
+        <div className="mt-5 grid gap-4 pb-16 md:grid-cols-2 xl:grid-cols-3">
+          {invites.map((campaign) => (
+            <MkCard
+              key={campaign.id}
+              campaign={campaign}
+              onToggle={(value) => mutate((d) => { const it = d.campaigns.find((x) => x.id === campaign.id); if (it) it.enabled = value; })}
+              onEdit={() => setEditing(campaign.id)}
+              onTest={() => setTesting(campaign.id)}
+              onRevert={() => mutate((d) => { const it = d.campaigns.find((x) => x.id === campaign.id); if (it) { it.variants.direct = defaultVariant(it.id, "direct"); it.variants.ota = defaultVariant(it.id, "ota"); } })}
+            />
           ))}
         </div>
       </div>
@@ -89,6 +104,8 @@ export function CreateWorkspace() {
       </AlertDialog>
 
       {studio && <AiCreateStudio onClose={() => setStudio(false)} onReview={() => { setStudio(false); setFreshAi(true); }} />}
+      {editing && <CampaignEditor id={editing} onClose={() => setEditing(null)} />}
+      <TestCampaignDialog campaign={mk.campaigns.find((c) => c.id === testing) ?? null} open={Boolean(testing)} onClose={() => setTesting(null)} />
       {open && <ReviewWorkspace id={open.id} openAi={open.ai} onClose={() => setOpen(null)} />}
     </MarketingShell>
   );
