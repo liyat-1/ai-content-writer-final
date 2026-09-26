@@ -85,7 +85,7 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
           <label className="flex items-center gap-2 text-[11.5px] font-medium text-muted-foreground">
             Guest segment
             <select value={segment} onChange={(e) => setSegment(e.target.value as Segment)} className="rounded-sm border border-border bg-background px-2 py-1.5 text-[12.5px] font-semibold text-card-foreground">
-              {segs.map((s) => <option key={s} value={s}>{SEGMENT_LABEL[s]}</option>)}
+              {(["direct", "ota"] as Segment[]).map((s) => <option key={s} value={s}>{SEGMENT_LABEL[s]}</option>)}
             </select>
           </label>
           <div className="flex gap-0.5 rounded-sm bg-muted p-0.5">
