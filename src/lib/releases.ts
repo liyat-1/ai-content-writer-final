@@ -36,13 +36,13 @@ export const RELEASES: Release[] = [
     comparison: "Year-round foundation 2026",
   },
   {
-    id: "sep-nov-2026", name: "September–November 2026", year: 2026, from: 8, to: 10,
+    id: "sep-nov-2026", name: "September–October 2026", year: 2026, from: 8, to: 9,
     source: "AI generated", created: "Sep 27", publishedAt: "Sep 27, 2026 · 2:14 PM", status: "Live",
     properties: 29, editedCampaigns: 1, campaignCount: 16, replaces: "Summer 2026",
-    summary: "A seasonal return-to-New-York story is now live across autumn guest messages.",
+    summary: "A seasonal return-to-New-York story is live for September and October. The year-round foundation resumes in November.",
     changes: ["Added Broadway Week and rooftop reopening", "Shortened mobile text to one clear action", "Used warmer local language for OTA guests"],
     expectedEffect: "Likely to lift opens because event-led subjects outperformed generic subjects last September.",
-    comparison: "September–November 2025",
+    comparison: "September–October 2025",
   },
   {
     id: "summer-2026", name: "Summer 2026", year: 2026, from: 5, to: 7,
@@ -72,13 +72,13 @@ export const RELEASES: Release[] = [
     comparison: "Holiday 2024",
   },
   {
-    id: "sep-nov-2025", name: "September–November 2025", year: 2025, from: 8, to: 10,
+    id: "sep-nov-2025", name: "September–October 2025", year: 2025, from: 8, to: 9,
     source: "AI generated", created: "Aug 29", publishedAt: "Aug 29, 2025 · 3:18 PM", status: "Replaced",
     properties: 28, campaignCount: 16,
     summary: "Last year's autumn publication focused on city weekends and early holiday planning.",
     changes: ["Added weekend itinerary ideas", "Featured direct-booking flexibility", "Used neighborhood recommendations"],
     expectedEffect: "Performance was strongest when a local event was named directly in the subject.",
-    comparison: "September–November 2024",
+    comparison: "September–October 2024",
   },
   {
     id: "default", name: "Year-round foundation 2026", year: 2026, from: 0, to: 11,
@@ -149,9 +149,9 @@ export const RELEASE_RESULTS: Record<string, ReleaseResult> = {
     insights: [{ id: "h26", text: "Results will appear here after the publication starts on November 1.", evidence: "This publication is scheduled and has not sent any guest messages yet." }],
   },
   "sep-nov-2026": {
-    releaseId: "sep-nov-2026", measuredThrough: "Sep 27, 2026", sampleNote: "3 days of the live publication · compared with Sep–Nov 2025",
+    releaseId: "sep-nov-2026", measuredThrough: "Sep 27, 2026", sampleNote: "3 days of the live publication · compared with Sep–Oct 2025",
     metrics: [{ label: "Click rate", value: "7.9%", previous: "7.1%", delta: "+0.8 pts" }, { label: "Click-to-book", value: "2.8%", previous: "2.3%", delta: "+0.5 pts" }, { label: "Spam rate", value: "0.08%", previous: "0.12%", delta: "−0.04 pts" }],
-    months: [{ month: 8, clickRate: 7.9, clickToBook: 2.8, spamRate: 0.08, priorClickRate: 7.1 }, { month: 9, clickRate: 0, clickToBook: 0, spamRate: 0, priorClickRate: 7.1 }, { month: 10, clickRate: 0, clickToBook: 0, spamRate: 0, priorClickRate: 7.4 }],
+    months: [{ month: 8, clickRate: 7.9, clickToBook: 2.8, spamRate: 0.08, priorClickRate: 7.1 }, { month: 9, clickRate: 0, clickToBook: 0, spamRate: 0, priorClickRate: 7.1 }],
     campaigns: campaignResults(0.3),
     insights: [
       { id: "26a", text: "Event-led subjects are opening more often for Direct guests.", evidence: "Broadway Week subjects opened at 24% versus 18% for the comparable 2025 publication." },
@@ -180,9 +180,9 @@ export const RELEASE_RESULTS: Record<string, ReleaseResult> = {
     insights: [{ id: "hol1", text: "Holiday market recommendations gave guests a clear reason to return.", evidence: "Messages naming a market or event reached 9.3% engagement versus 7.0% for generic holiday messages." }],
   },
   "sep-nov-2025": {
-    releaseId: "sep-nov-2025", measuredThrough: "Nov 30, 2025", sampleNote: "Full 3-month publication · compared with Sep–Nov 2024",
+    releaseId: "sep-nov-2025", measuredThrough: "Oct 31, 2025", sampleNote: "Full 2-month publication · compared with Sep–Oct 2024",
     metrics: [{ label: "Click rate", value: "7.1%", previous: "6.6%", delta: "+0.5 pts" }, { label: "Click-to-book", value: "2.3%", previous: "2.1%", delta: "+0.2 pts" }, { label: "Spam rate", value: "0.12%", previous: "0.15%", delta: "−0.03 pts" }],
-    months: [{ month: 8, clickRate: 6.8, clickToBook: 2.1, spamRate: 0.13, priorClickRate: 6.3 }, { month: 9, clickRate: 7.1, clickToBook: 2.3, spamRate: 0.12, priorClickRate: 6.6 }, { month: 10, clickRate: 7.4, clickToBook: 2.5, spamRate: 0.11, priorClickRate: 6.9 }],
+    months: [{ month: 8, clickRate: 6.8, clickToBook: 2.1, spamRate: 0.13, priorClickRate: 6.3 }, { month: 9, clickRate: 7.1, clickToBook: 2.3, spamRate: 0.12, priorClickRate: 6.6 }],
     campaigns: campaignResults(0),
     insights: [{ id: "fall25", text: "Local weekend ideas performed better than generic return messaging.", evidence: "Campaigns naming a neighborhood or event earned 13% more clicks." }],
   },
