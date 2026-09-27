@@ -180,3 +180,4 @@
 - [ ] Limit AI edit suggestions to five and simplify personalization controls
 - [ ] Keep draft Save changes separate from the top-level Publish all action
 - [ ] Verify calendar, AI planning, review, version switching, and publish flows at desktop and mobile widths
+- [ ] Keep review guest-segment selection synchronized across Preview, Edit with AI, Compare, and Content insight
