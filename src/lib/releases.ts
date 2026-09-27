@@ -8,20 +8,150 @@ export type ReleaseStatus = "Live" | "Scheduled" | "Replaced" | "Removed";
 export type Release = {
   id: string;
   name: string;
+  year: number;
   from: number; // month index
   to: number;
   source: "Default" | "AI generated" | "Manual";
   created: string;
+  publishedAt: string;
   status: ReleaseStatus;
   properties: number;
   replaces?: string;
   editedCampaigns?: number;
+  campaignCount: number;
+  summary: string;
+  changes: string[];
+  expectedEffect: string;
+  comparison: string;
 };
 
 export const RELEASES: Release[] = [
-  { id: "default", name: "Year-round release", from: 0, to: 11, source: "Default", created: "Jan 2", status: "Live", properties: 31 },
-  { id: "sep-nov", name: "Sept–Nov release", from: 8, to: 10, source: "AI generated", created: "Sep 27", status: "Live", properties: 29, editedCampaigns: 1 },
+  {
+    id: "sep-nov-2026", name: "September–November 2026", year: 2026, from: 8, to: 10,
+    source: "AI generated", created: "Sep 27", publishedAt: "Sep 27, 2026 · 2:14 PM", status: "Live",
+    properties: 29, editedCampaigns: 1, campaignCount: 11, replaces: "Summer 2026",
+    summary: "A seasonal return-to-New-York story is now live across autumn guest messages.",
+    changes: ["Added Broadway Week and rooftop reopening", "Shortened mobile text to one clear action", "Used warmer local language for OTA guests"],
+    expectedEffect: "Likely to lift opens because event-led subjects outperformed generic subjects last September.",
+    comparison: "September–November 2025",
+  },
+  {
+    id: "summer-2026", name: "Summer 2026", year: 2026, from: 5, to: 7,
+    source: "Manual", created: "May 28", publishedAt: "May 28, 2026 · 10:32 AM", status: "Replaced",
+    properties: 31, editedCampaigns: 4, campaignCount: 11,
+    summary: "Summer messages highlighted family stays, late checkout, and the rooftop season.",
+    changes: ["Moved family benefits into the opening line", "Added rooftop imagery to email", "Introduced late-checkout reminders"],
+    expectedEffect: "Likely improved clicks because the offer appeared earlier and used a single destination link.",
+    comparison: "Summer 2025",
+  },
+  {
+    id: "winter-spring-2026", name: "January–May 2026", year: 2026, from: 0, to: 4,
+    source: "AI generated", created: "Jan 2", publishedAt: "Jan 2, 2026 · 9:05 AM", status: "Replaced",
+    properties: 31, campaignCount: 11,
+    summary: "The first seasonal publication introduced local planning tips and clearer arrival messages.",
+    changes: ["Added indoor winter recommendations", "Clarified arrival-day timing", "Simplified long-stay return messages"],
+    expectedEffect: "Likely reduced guest questions because arrival details were moved into the first message.",
+    comparison: "January–May 2025",
+  },
+  {
+    id: "holiday-2025", name: "Holiday 2025", year: 2025, from: 10, to: 11,
+    source: "Manual", created: "Nov 4", publishedAt: "Nov 4, 2025 · 11:40 AM", status: "Replaced",
+    properties: 30, editedCampaigns: 3, campaignCount: 11,
+    summary: "Holiday messaging centered gifting, city lights, and festive weekend stays.",
+    changes: ["Added holiday market recommendations", "Introduced gift-stay email layout", "Adjusted send timing for weekend arrivals"],
+    expectedEffect: "Likely increased return visits because the publication gave guests a timely reason to book again.",
+    comparison: "Holiday 2024",
+  },
+  {
+    id: "sep-nov-2025", name: "September–November 2025", year: 2025, from: 8, to: 10,
+    source: "AI generated", created: "Aug 29", publishedAt: "Aug 29, 2025 · 3:18 PM", status: "Replaced",
+    properties: 28, campaignCount: 11,
+    summary: "Last year's autumn publication focused on city weekends and early holiday planning.",
+    changes: ["Added weekend itinerary ideas", "Featured direct-booking flexibility", "Used neighborhood recommendations"],
+    expectedEffect: "Performance was strongest when a local event was named directly in the subject.",
+    comparison: "September–November 2024",
+  },
+  {
+    id: "default", name: "Year-round foundation", year: 2025, from: 0, to: 11,
+    source: "Default", created: "Jan 2", publishedAt: "Jan 2, 2025 · 8:30 AM", status: "Live",
+    properties: 31, campaignCount: 11,
+    summary: "The fallback publication keeps essential booking and stay messages available all year.",
+    changes: ["Standardized guest names and property details", "Added consistent direct-booking links", "Established the default campaign timing"],
+    expectedEffect: "Provides a stable baseline whenever no seasonal publication is active.",
+    comparison: "Year-round 2024",
+  },
 ];
+
+export const ACTIVE_RELEASE_ID = "sep-nov-2026";
+
+export type ReleaseMetric = { label: string; value: string; delta: string };
+export type ReleaseMonthResult = { month: number; clicks: number; engagement: number; calls: number };
+export type ReleaseCampaignResult = { campaignId: string; clicks: number; engagement: number; lift: number; confidence: Confidence };
+export type ReleaseResult = {
+  releaseId: string;
+  measuredThrough: string;
+  sampleNote: string;
+  metrics: ReleaseMetric[];
+  months: ReleaseMonthResult[];
+  campaigns: ReleaseCampaignResult[];
+  insights: Insight[];
+};
+
+const campaignResults = (scale: number, confidence: Confidence): ReleaseCampaignResult[] => [
+  { campaignId: "after-last-visit", clicks: Math.round(734 * scale), engagement: 8.7, lift: 1.4, confidence },
+  { campaignId: "lost-3", clicks: Math.round(612 * scale), engagement: 8.1, lift: 0.9, confidence },
+  { campaignId: "just-booked", clicks: Math.round(498 * scale), engagement: 7.8, lift: 0.6, confidence },
+  { campaignId: "before-arrival", clicks: Math.round(421 * scale), engagement: 7.2, lift: 0.4, confidence },
+  { campaignId: "post-checkout", clicks: Math.round(387 * scale), engagement: 6.9, lift: 0.2, confidence },
+];
+
+export const RELEASE_RESULTS: Record<string, ReleaseResult> = {
+  "sep-nov-2026": {
+    releaseId: "sep-nov-2026", measuredThrough: "Sep 27, 2026", sampleNote: "3 days of the live publication · compared with Sep–Nov 2025",
+    metrics: [{ label: "Clicks", value: "1,126", delta: "+14% vs the same first 3 days" }, { label: "Engagement rate", value: "7.9%", delta: "+0.8 pts vs Sep–Nov 2025" }, { label: "Calls received", value: "74", delta: "+9% vs the same first 3 days" }],
+    months: [{ month: 8, clicks: 1126, engagement: 7.9, calls: 74 }, { month: 9, clicks: 0, engagement: 0, calls: 0 }, { month: 10, clicks: 0, engagement: 0, calls: 0 }],
+    campaigns: campaignResults(0.42, "early"),
+    insights: [
+      { id: "26a", text: "Event-led subjects are opening more often for Direct guests.", evidence: "Broadway Week subjects opened at 24% versus 18% for the comparable 2025 publication.", conf: "early" },
+      { id: "26b", text: "Shorter text messages are producing more clicks on mobile.", evidence: "Messages under 140 characters reached 3.4% click-through versus 2.6% in the comparison publication.", conf: "early" },
+    ],
+  },
+  "summer-2026": {
+    releaseId: "summer-2026", measuredThrough: "Aug 31, 2026", sampleNote: "Full 3-month publication · compared with Summer 2025",
+    metrics: [{ label: "Clicks", value: "12,940", delta: "+11% vs Summer 2025" }, { label: "Engagement rate", value: "7.6%", delta: "+0.7 pts vs Summer 2025" }, { label: "Calls received", value: "842", delta: "+5% vs Summer 2025" }],
+    months: [{ month: 5, clicks: 3980, engagement: 7.1, calls: 251 }, { month: 6, clicks: 4512, engagement: 7.7, calls: 286 }, { month: 7, clicks: 4448, engagement: 8.0, calls: 305 }],
+    campaigns: campaignResults(1.15, "solid"),
+    insights: [{ id: "sum1", text: "Family-focused messages produced the strongest sustained lift.", evidence: "Family benefit messages reached 9.1% engagement, up 1.6 points from Summer 2025.", conf: "solid" }],
+  },
+  "winter-spring-2026": {
+    releaseId: "winter-spring-2026", measuredThrough: "May 31, 2026", sampleNote: "Full 5-month publication · compared with January–May 2025",
+    metrics: [{ label: "Clicks", value: "18,604", delta: "+8% vs Jan–May 2025" }, { label: "Engagement rate", value: "7.1%", delta: "+0.4 pts vs Jan–May 2025" }, { label: "Calls received", value: "1,210", delta: "−3% vs Jan–May 2025" }],
+    months: [0, 1, 2, 3, 4].map((month, i) => ({ month, clicks: 3280 + i * 217, engagement: 6.7 + i * 0.2, calls: 226 + i * 8 })),
+    campaigns: campaignResults(1.4, "solid"),
+    insights: [{ id: "ws1", text: "Clearer pre-arrival details coincided with fewer guest calls.", evidence: "Calls fell 3% while before-arrival engagement increased 0.9 points.", conf: "solid" }],
+  },
+  "holiday-2025": {
+    releaseId: "holiday-2025", measuredThrough: "Dec 31, 2025", sampleNote: "Full 2-month publication · compared with Holiday 2024",
+    metrics: [{ label: "Clicks", value: "8,902", delta: "+16% vs Holiday 2024" }, { label: "Engagement rate", value: "8.2%", delta: "+1.1 pts vs Holiday 2024" }, { label: "Calls received", value: "516", delta: "+4% vs Holiday 2024" }],
+    months: [{ month: 10, clicks: 4210, engagement: 7.8, calls: 244 }, { month: 11, clicks: 4692, engagement: 8.6, calls: 272 }],
+    campaigns: campaignResults(0.92, "solid"),
+    insights: [{ id: "hol1", text: "Holiday market recommendations gave guests a clear reason to return.", evidence: "Messages naming a market or event reached 9.3% engagement versus 7.0% for generic holiday messages.", conf: "solid" }],
+  },
+  "sep-nov-2025": {
+    releaseId: "sep-nov-2025", measuredThrough: "Nov 30, 2025", sampleNote: "Full 3-month publication · compared with Sep–Nov 2024",
+    metrics: [{ label: "Clicks", value: "11,284", delta: "+7% vs Sep–Nov 2024" }, { label: "Engagement rate", value: "7.1%", delta: "+0.5 pts vs Sep–Nov 2024" }, { label: "Calls received", value: "694", delta: "+2% vs Sep–Nov 2024" }],
+    months: [{ month: 8, clicks: 3528, engagement: 6.8, calls: 218 }, { month: 9, clicks: 3712, engagement: 7.1, calls: 229 }, { month: 10, clicks: 4044, engagement: 7.4, calls: 247 }],
+    campaigns: campaignResults(1, "solid"),
+    insights: [{ id: "fall25", text: "Local weekend ideas performed better than generic return messaging.", evidence: "Campaigns naming a neighborhood or event earned 13% more clicks.", conf: "solid" }],
+  },
+  default: {
+    releaseId: "default", measuredThrough: "Dec 31, 2025", sampleNote: "Year-round baseline · compared with the 2024 foundation",
+    metrics: [{ label: "Clicks", value: "41,720", delta: "+5% vs 2024" }, { label: "Engagement rate", value: "6.5%", delta: "+0.3 pts vs 2024" }, { label: "Calls received", value: "3,148", delta: "−2% vs 2024" }],
+    months: Array.from({ length: 12 }, (_, month) => ({ month, clicks: 3200 + month * 51, engagement: 6.1 + (month % 4) * 0.2, calls: 248 + (month % 3) * 9 })),
+    campaigns: campaignResults(2.9, "solid"),
+    insights: [{ id: "base1", text: "The year-round foundation remained a steady fallback across all properties.", evidence: "Engagement varied by less than 0.6 points across the year.", conf: "solid" }],
+  },
+};
 
 export type SlotVersion = { v: number; by: string; when: string; kind: "Default" | "AI generated" | "Manual edit" | "Revert"; properties: number; note: string };
 
