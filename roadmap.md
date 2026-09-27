@@ -158,3 +158,10 @@
 - [x] Add card-level Email/Text and Direct/OTA preview controls, limited to each campaign's actual channels
 - [x] Keep all primary actions blue and make AI-authored campaign cards visibly distinct
 - [x] Reuse the existing campaign editor structure for Content Library editing and remove the review checklist
+
+## Publishing-first content management
+
+- [ ] Make the current, year-round published package the first view, with month navigation and contextual future-month personalization
+- [ ] Show campaign cards across invites, transactional and in-property, with only Edit content and Test as primary actions
+- [ ] Make AI creation a package-level monthly planning flow with flexible dates, attachments and review before publication
+- [ ] Align Published and Performance views with the monthly package mental model and clearly label sample figures
