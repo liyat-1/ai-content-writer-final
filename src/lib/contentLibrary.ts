@@ -32,6 +32,7 @@ export type LibraryCampaign = {
 
 export type Version = { campaignId: string; v: number; label: string; by: string; when: string };
 export type Publication = { id: string; name: string; when: string; campaigns: string[]; pieces: number; channels: string; segments: string; version: string };
+export type MonthPackage = { id: string; month: number; year: number; label: string; version: string; source: "default" | "ai" | "team"; status: "Live now" | "Scheduled" | "Archived"; note: string };
 
 export const SEGMENT_LABEL: Record<Segment, string> = { direct: "Direct guests", ota: "OTA guests" };
 export const HOTEL_NAME = "Holiday Inn Times Square";
@@ -186,6 +187,27 @@ const IDEAS: Idea[] = [
 ];
 
 export const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+export const MONTH_PACKAGES: MonthPackage[] = [
+  { id: "sep-default", month: 8, year: 2026, label: "Original year-round", version: "v1", source: "default", status: "Archived", note: "Directful's original guest journey" },
+  { id: "sep-live", month: 8, year: 2026, label: "Autumn in NYC", version: "v3", source: "ai", status: "Live now", note: "Published Sep 2 by Sevket Yilmaz" },
+  { id: "sep-edit", month: 8, year: 2026, label: "Autumn refined", version: "v3.1", source: "team", status: "Live now", note: "Edited Sep 12 by Sevket Yilmaz" },
+  { id: "oct-default", month: 9, year: 2026, label: "Original year-round", version: "v1", source: "default", status: "Archived", note: "Fallback content" },
+  { id: "oct-ai", month: 9, year: 2026, label: "October city break", version: "v4", source: "ai", status: "Scheduled", note: "Scheduled for Oct 1" },
+  { id: "nov-default", month: 10, year: 2026, label: "Original year-round", version: "v1", source: "default", status: "Archived", note: "Fallback content" },
+  { id: "nov-ai", month: 10, year: 2026, label: "Holiday season", version: "v5", source: "ai", status: "Scheduled", note: "Scheduled for Nov 1" },
+];
+
+export function packageSnippet(campaign: LibraryCampaign, pack: MonthPackage, segment: Segment = "direct") {
+  const base = fillTokens(campaign.content[segment].text);
+  if (pack.source === "default") return base;
+  const opener = pack.month === 8 ? "Autumn in New York is calling" : pack.month === 9 ? "Make October in Midtown yours" : "The holiday season is glowing in Times Square";
+  return `${opener}, Alex. ${segment === "direct" ? "Your best direct rate is waiting." : "Book direct next time for more flexibility."}`;
+}
+
+function fillTokens(value: string) {
+  return value.replace(/\{first_name\}/g, "Alex").replace(/\{booking_link\}/g, "hi-ts.com/book").replace(/\{[a-z_]+\}/g, "your stay");
+}
 
 export function ideasFor(start: number, end: number) {
   return IDEAS.filter((i) => i.month >= start && i.month <= end);
