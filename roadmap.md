@@ -226,4 +226,5 @@
 - [x] Close AI back to the original published-content view and reopen in full mode
 - [x] Verify full, minimized, restored, and closed states at desktop and mobile widths
 - [x] Restyle full and minimized AI modes from the supplied airy split-workspace references
-- [ ] Verify publication selection and both AI modes at desktop and mobile widths
+- [x] Rebuild minimized planning as a purpose-designed assistant rail instead of a compressed full workspace
+- [x] Verify publication selection and both AI modes at desktop and mobile widths

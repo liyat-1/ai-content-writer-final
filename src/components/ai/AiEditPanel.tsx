@@ -155,12 +155,12 @@ export function AiEditPanel({
 
   return (
     <div className={embedded ? "h-full min-h-[520px]" : `fixed inset-0 grid place-items-center bg-foreground/25 p-3 backdrop-blur-[3px] sm:p-6 ${className}`} onMouseDown={(event) => !embedded && event.target === event.currentTarget && onClose()}>
-    <aside role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : "true"} aria-label="Directful AI" className={`ai-rise relative flex w-full flex-col overflow-hidden border border-border bg-card ${embedded ? "h-full min-h-[520px] rounded-lg shadow-card" : "max-h-[min(86vh,50rem)] max-w-[48rem] rounded-xl shadow-float"}`}>
-      <header className="flex items-center justify-between gap-4 border-b border-border/70 px-4 py-3.5 sm:px-6">
+    <aside role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : "true"} aria-label="Directful AI" className={`ai-rise relative flex w-full flex-col overflow-hidden border border-border bg-card ${embedded ? "h-full min-h-[560px] rounded-lg shadow-lift" : "max-h-[min(86vh,50rem)] max-w-[48rem] rounded-xl shadow-float"}`}>
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border/70 px-4 py-3.5 sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
           <AiMark size={32} />
-          <div className="min-w-0"><p className="text-[13.5px] font-semibold text-card-foreground">AI content editor</p>
-          <p className="truncate text-[11px] text-muted-foreground">Editing {title} · {copy.kind === "email" ? "Email" : "Text"}</p></div>
+          <div className="min-w-0"><div className="flex items-center gap-2"><p className="truncate text-[13.5px] font-semibold text-card-foreground">Content assistant</p><span className="size-1.5 shrink-0 rounded-full bg-emerald-500" /></div>
+          <p className="truncate text-[11px] text-muted-foreground">{title} · {copy.kind === "email" ? "Email" : "Text"}</p></div>
         </div>
         <div className="flex items-center gap-1">
           {onMinimize && <Button variant="ghost" size="icon" onClick={onMinimize} aria-label="Minimize Directful AI"><Minimize2 size={16} /></Button>}
@@ -168,15 +168,15 @@ export function AiEditPanel({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-7 overflow-y-auto px-4 py-7 sm:px-8">
+      <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-4 py-6 sm:px-5">
         {msgs.map((m, idx) =>
           m.role === "user" ? (
             <Message key={idx} from="user" className="max-w-[85%]"><MessageContent className="bg-primary px-3 py-2 text-[12.5px] text-primary-foreground"><MessageResponse>{m.text}</MessageResponse></MessageContent></Message>
           ) : (
             <div key={idx} className="space-y-3">
-              <Message from="assistant" className="max-w-full"><MessageContent className="w-full bg-transparent p-0"><div className="flex gap-3 text-[12.5px] leading-relaxed text-card-foreground"><AiMark size={26} /><MessageResponse className="pt-1">{m.text}</MessageResponse></div></MessageContent></Message>
+               <Message from="assistant" className="max-w-full"><MessageContent className="w-full bg-transparent p-0"><div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 text-[12.5px] leading-relaxed text-card-foreground"><AiMark size={28} /><MessageResponse className="pt-1">{m.text}</MessageResponse></div></MessageContent></Message>
               {m.proposal && (
-                <div className={`ml-9 rounded-lg border bg-canvas/45 ${m.proposal.state === "open" ? "border-brand/30 shadow-card" : "border-border opacity-70"}`}>
+                 <div className={`ml-10 overflow-hidden rounded-lg border bg-canvas/45 ${m.proposal.state === "open" ? "border-brand/30 shadow-card" : "border-border opacity-70"}`}>
                   <div className="flex items-center justify-between border-b border-border px-3 py-2">
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Suggested update</p>
                     {m.proposal.state !== "open" && <span className="text-[11px] text-muted-foreground">{m.proposal.state === "applied" ? "Applied" : "Not used"}</span>}
@@ -222,13 +222,13 @@ export function AiEditPanel({
         <div ref={endRef} />
       </div>
 
-      <div className="border-t border-border/70 bg-card px-4 pb-4 pt-3 sm:px-6 sm:pb-5">
-        <div className="mb-2 flex items-center gap-1 overflow-x-auto pb-1">
+      <div className="border-t border-border/70 bg-card px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+        <div className="mb-3 grid grid-cols-2 gap-2">
           <Button variant="ghost" size="sm" onClick={() => setShowPersonalize((v) => !v)} className="shrink-0 px-2 text-[12px]">
           <SlidersHorizontal size={13} />Personalize<ChevronDown size={13} className={`transition-transform ${showPersonalize ? "rotate-180" : ""}`} />
           </Button>
-          {EDIT_QUICK_ACTIONS.filter((a) => copy.kind === "email" || !/subject|text version/i.test(a)).slice(0, 4).map((a) => (
-            <button key={a} className={`${chip(false)} shrink-0 bg-background`} onClick={() => ask(a)}>{a}</button>
+          {EDIT_QUICK_ACTIONS.filter((a) => copy.kind === "email" || !/subject|text version/i.test(a)).slice(0, 3).map((a) => (
+            <Button key={a} variant="outline" size="sm" className="min-w-0 justify-start truncate px-2.5 text-[11.5px] font-medium" onClick={() => ask(a)}>{a}</Button>
           ))}
         </div>
         {showPersonalize && (

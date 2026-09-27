@@ -166,7 +166,7 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
 
   return (
     <div className="fixed inset-0 z-[60] grid place-items-center bg-foreground/70 p-2 sm:p-4" onMouseDown={(event) => event.target === event.currentTarget && closeSafely()}>
-      <section role="dialog" aria-modal="true" aria-labelledby="campaign-editor-title" className="flex h-[92vh] max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-lg border border-border bg-canvas shadow-float">
+      <section role="dialog" aria-modal="true" aria-labelledby="campaign-editor-title" className="flex h-[92vh] max-h-[92vh] w-full max-w-7xl flex-col overflow-hidden rounded-lg border border-border bg-canvas shadow-float">
       <header className="flex flex-col gap-3 border-b border-border bg-card px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <div className="min-w-0"><p className="text-[10.5px] font-medium text-muted-foreground">Automated invite</p><h2 id="campaign-editor-title" className="truncate text-[17px] font-semibold text-card-foreground">{draft.name}</h2><p className="truncate text-[11.5px] text-muted-foreground">{STRATEGY_LABEL[draft.strategy]}</p></div>
@@ -175,7 +175,7 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
-        <div className={`mx-auto grid max-w-6xl gap-6 ${rightView === "minimized" ? "lg:grid-cols-[minmax(0,1fr)_68px]" : "lg:grid-cols-[minmax(0,1fr)_380px]"}`}>
+        <div className={`mx-auto grid max-w-7xl gap-6 ${rightView === "minimized" ? "lg:grid-cols-[minmax(0,1fr)_64px]" : "xl:grid-cols-[minmax(0,1fr)_440px]"}`}>
           <div className="min-w-0">
             {/* Channel tabs — Text and Email each keep their own Direct / OTA sections */}
             <div className="mb-3 flex flex-wrap items-center gap-2">
