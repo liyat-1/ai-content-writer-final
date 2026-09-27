@@ -5,7 +5,7 @@ import { SmsPreview } from "@/components/editor/SmsPreview";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { EmailMock, IMAGES, OriginMarker, StatusBadge, fill } from "./shared";
-import { IMAGE_LABEL, SEGMENT_LABEL, approveCampaign, saveCampaign, useLibrary, type Channel, type LibraryCampaign, type Segment } from "@/lib/contentLibrary";
+import { IMAGE_LABEL, SEGMENT_LABEL, saveCampaign, useLibrary, type Channel, type LibraryCampaign, type Segment } from "@/lib/contentLibrary";
 import type { Copy } from "@/lib/aiWriter";
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
@@ -51,7 +51,7 @@ export function ReviewWorkspace({ id, openAi = false, onClose }: { id: string; o
           {mode === "insight" && <InsightView campaign={draft} segment={segment} channel={channel} />}
         </div></section>
       </div></div>
-       <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card px-4 py-3 sm:px-5"><p className="text-[11.5px] text-muted-foreground">Review is optional. Save any changes, then return to the release when you are ready.</p><Button variant="brand" disabled={saved.status === "Approved" || saved.status === "Published"} onClick={() => approveCampaign(id)}>{saved.status === "Approved" ? "Reviewed" : saved.status === "Published" ? "Published" : "Mark as reviewed"}</Button></footer>
+       <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card px-4 py-3 sm:px-5"><p className="text-[11.5px] text-muted-foreground">Review is optional. Save any changes, then go back and publish when you are ready.</p><Button variant="brand" onClick={onClose}>Back to release</Button></footer>
     </section>
 
     <AlertDialog open={confirm} onOpenChange={setConfirm}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Unsaved changes</AlertDialogTitle><AlertDialogDescription>You have unsaved changes to {draft.name}. Leave without saving?</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Keep editing</AlertDialogCancel><AlertDialogAction onClick={onClose}>Leave</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
