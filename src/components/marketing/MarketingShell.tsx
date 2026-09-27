@@ -48,11 +48,9 @@ const GROUPS: { label?: string; items: Item[] }[] = [
   {
     label: "Content Library",
     items: [
-      { label: "Create", to: "/content", icon: Sparkles },
-      { label: "Published", to: "/content/published", icon: Send },
-      { label: "Performance", to: "/content/performance", icon: BarChart3 },
-      { label: "A/B Tests", to: "/content/ab-tests", icon: FlaskConical },
-      { label: "History", to: "/content/history", icon: History },
+      { label: "Content", to: "/content", icon: Sparkles },
+      { label: "Releases", to: "/content/releases", icon: Send },
+      { label: "Results", to: "/content/results", icon: BarChart3 },
       { label: "Settings", to: "/content/settings", icon: Settings2 },
     ],
   },
@@ -70,9 +68,9 @@ const MOBILE_NAV = [
   { label: "Transactional", to: "/marketing/transactional" },
   { label: "In-property", to: "/marketing/in-property" },
   { label: "Media", to: "/marketing/media" },
-  { label: "Create", to: "/content" },
-  { label: "Published", to: "/content/published" },
-  { label: "History", to: "/content/history" },
+  { label: "Content", to: "/content" },
+  { label: "Releases", to: "/content/releases" },
+  { label: "Results", to: "/content/results" },
   { label: "Promotions", to: "/marketing/promotions" },
   { label: "Drip", to: "/campaign" },
 ];

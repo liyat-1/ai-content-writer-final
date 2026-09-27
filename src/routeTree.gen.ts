@@ -21,6 +21,8 @@ import { Route as ContentAbTestsRouteImport } from './routes/content.ab-tests'
 import { Route as ContentHistoryRouteImport } from './routes/content.history'
 import { Route as ContentPerformanceRouteImport } from './routes/content.performance'
 import { Route as ContentPublishedRouteImport } from './routes/content.published'
+import { Route as ContentReleasesRouteImport } from './routes/content.releases'
+import { Route as ContentResultsRouteImport } from './routes/content.results'
 import { Route as ContentSettingsRouteImport } from './routes/content.settings'
 import { Route as MarketingAiContentRouteImport } from './routes/marketing.ai-content'
 import { Route as MarketingInPropertyRouteImport } from './routes/marketing.in-property'
@@ -94,6 +96,16 @@ const ContentPerformanceRoute = ContentPerformanceRouteImport.update({
 const ContentPublishedRoute = ContentPublishedRouteImport.update({
   id: '/content/published',
   path: '/content/published',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentReleasesRoute = ContentReleasesRouteImport.update({
+  id: '/content/releases',
+  path: '/content/releases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentResultsRoute = ContentResultsRouteImport.update({
+  id: '/content/results',
+  path: '/content/results',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContentSettingsRoute = ContentSettingsRouteImport.update({
@@ -179,6 +191,8 @@ export interface FileRoutesByFullPath {
   '/content/history': typeof ContentHistoryRoute
   '/content/performance': typeof ContentPerformanceRoute
   '/content/published': typeof ContentPublishedRoute
+  '/content/releases': typeof ContentReleasesRoute
+  '/content/results': typeof ContentResultsRoute
   '/content/settings': typeof ContentSettingsRoute
   '/marketing/ai-content': typeof MarketingAiContentRoute
   '/marketing/in-property': typeof MarketingInPropertyRoute
@@ -206,6 +220,8 @@ export interface FileRoutesByTo {
   '/content/history': typeof ContentHistoryRoute
   '/content/performance': typeof ContentPerformanceRoute
   '/content/published': typeof ContentPublishedRoute
+  '/content/releases': typeof ContentReleasesRoute
+  '/content/results': typeof ContentResultsRoute
   '/content/settings': typeof ContentSettingsRoute
   '/marketing/ai-content': typeof MarketingAiContentRoute
   '/marketing/in-property': typeof MarketingInPropertyRoute
@@ -235,6 +251,8 @@ export interface FileRoutesById {
   '/content/history': typeof ContentHistoryRoute
   '/content/performance': typeof ContentPerformanceRoute
   '/content/published': typeof ContentPublishedRoute
+  '/content/releases': typeof ContentReleasesRoute
+  '/content/results': typeof ContentResultsRoute
   '/content/settings': typeof ContentSettingsRoute
   '/marketing/ai-content': typeof MarketingAiContentRoute
   '/marketing/in-property': typeof MarketingInPropertyRoute
@@ -265,6 +283,8 @@ export interface FileRouteTypes {
     | '/content/history'
     | '/content/performance'
     | '/content/published'
+    | '/content/releases'
+    | '/content/results'
     | '/content/settings'
     | '/marketing/ai-content'
     | '/marketing/in-property'
@@ -292,6 +312,8 @@ export interface FileRouteTypes {
     | '/content/history'
     | '/content/performance'
     | '/content/published'
+    | '/content/releases'
+    | '/content/results'
     | '/content/settings'
     | '/marketing/ai-content'
     | '/marketing/in-property'
@@ -320,6 +342,8 @@ export interface FileRouteTypes {
     | '/content/history'
     | '/content/performance'
     | '/content/published'
+    | '/content/releases'
+    | '/content/results'
     | '/content/settings'
     | '/marketing/ai-content'
     | '/marketing/in-property'
@@ -349,6 +373,8 @@ export interface RootRouteChildren {
   ContentHistoryRoute: typeof ContentHistoryRoute
   ContentPerformanceRoute: typeof ContentPerformanceRoute
   ContentPublishedRoute: typeof ContentPublishedRoute
+  ContentReleasesRoute: typeof ContentReleasesRoute
+  ContentResultsRoute: typeof ContentResultsRoute
   ContentSettingsRoute: typeof ContentSettingsRoute
   MarketingAiContentRoute: typeof MarketingAiContentRoute
   MarketingInPropertyRoute: typeof MarketingInPropertyRoute
@@ -443,6 +469,20 @@ declare module '@tanstack/react-router' {
       path: '/content/published'
       fullPath: '/content/published'
       preLoaderRoute: typeof ContentPublishedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/releases': {
+      id: '/content/releases'
+      path: '/content/releases'
+      fullPath: '/content/releases'
+      preLoaderRoute: typeof ContentReleasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/results': {
+      id: '/content/results'
+      path: '/content/results'
+      fullPath: '/content/results'
+      preLoaderRoute: typeof ContentResultsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/content/settings': {
@@ -580,6 +620,8 @@ const rootRouteChildren: RootRouteChildren = {
   ContentHistoryRoute: ContentHistoryRoute,
   ContentPerformanceRoute: ContentPerformanceRoute,
   ContentPublishedRoute: ContentPublishedRoute,
+  ContentReleasesRoute: ContentReleasesRoute,
+  ContentResultsRoute: ContentResultsRoute,
   ContentSettingsRoute: ContentSettingsRoute,
   MarketingAiContentRoute: MarketingAiContentRoute,
   MarketingInPropertyRoute: MarketingInPropertyRoute,
