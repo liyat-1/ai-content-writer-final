@@ -199,3 +199,12 @@
 - [x] Rebuild Results around publication-specific KPIs, comparisons, insights, months, and campaigns
 - [x] Apply the selected editorial-ledger layout with Directful colors and Roboto
 - [x] Verify both pages and their drill-downs at desktop and mobile widths
+
+## Final Content workspace redesign
+
+- [ ] Replace campaign AI popup with contextual preview-area editing and a minimizable assistant rail
+- [ ] Add one-month and multi-month scheduled calendar views with a three-column desktop layout
+- [ ] Restore campaign-by-campaign AI generation progress and return to optional review/publish
+- [ ] Redesign Releases as a year-grouped publication timeline with month and campaign version detail
+- [ ] Redesign Results with publication-scoped monthly and campaign result cards and no confidence labels
+- [ ] Verify the full Content, Releases, and Results experience at desktop and mobile widths
