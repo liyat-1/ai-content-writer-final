@@ -169,15 +169,15 @@
 
 ## Calendar-led Content Library and AI creation flow
 
-- [ ] Rebuild the published-content landing view around a centered monthly calendar and version selector
-- [ ] Show live, scheduled, default, and review states directly over the campaign grid
-- [ ] Make version switching update campaign-card content and version labels
-- [ ] Rename the primary header action to Edit content and remove package/campaign/availability summary blocks
-- [ ] Redesign AI creation as a focused assistant workspace with persistent multimodal composer
-- [ ] Move timeframe, discovered context, plan review, and approval into the conversation body
-- [ ] Add attachment chips and local file input for documents, spreadsheets, images, and video
-- [ ] Build generated-content review with dynamic Preview, Edit with AI, Compare, and Content insight modes
-- [ ] Limit AI edit suggestions to five and simplify personalization controls
-- [ ] Keep draft Save changes separate from the top-level Publish all action
-- [ ] Verify calendar, AI planning, review, version switching, and publish flows at desktop and mobile widths
-- [ ] Keep review guest-segment selection synchronized across Preview, Edit with AI, Compare, and Content insight
+- [x] Rebuild the published-content landing view around a centered monthly calendar and version selector
+- [x] Show live, scheduled, default, and review states directly over the campaign grid
+- [x] Make version switching update campaign-card content and version labels
+- [x] Rename the primary header action to Edit content and remove package/campaign/availability summary blocks
+- [x] Redesign AI creation as a focused assistant workspace with persistent multimodal composer
+- [x] Move timeframe, discovered context, plan review, and approval into the conversation body
+- [x] Add attachment chips and local file input for documents, spreadsheets, images, and video
+- [x] Build generated-content review with dynamic Preview, Edit with AI, Compare, and Content insight modes
+- [x] Limit AI edit suggestions to five and simplify personalization controls
+- [x] Keep draft Save changes separate from the top-level Publish all action
+- [x] Verify calendar, AI planning, review, version switching, and publish flows at desktop and mobile widths
+- [x] Keep review guest-segment selection synchronized across Preview, Edit with AI, Compare, and Content insight
