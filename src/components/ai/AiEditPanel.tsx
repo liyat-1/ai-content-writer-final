@@ -1,6 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Check, ChevronDown, GitCompare, ImagePlus, Minimize2, RefreshCw, SlidersHorizontal, Pencil, X } from "lucide-react";
+import { Check, ChevronDown, FileText, GitCompare, Image, Minimize2, Paperclip, Plus, RefreshCw, SlidersHorizontal, Pencil, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
+import {
+  PromptInput,
+  PromptInputActionMenu,
+  PromptInputActionMenuContent,
+  PromptInputActionMenuItem,
+  PromptInputActionMenuTrigger,
+  PromptInputFooter,
+  PromptInputSubmit,
+  PromptInputTextarea,
+  PromptInputTools,
+  usePromptInputAttachments,
+} from "@/components/ai-elements/prompt-input";
 import { AiMark } from "@/components/content/shared";
 import { Sparkle } from "./Sparkle";
 import {
@@ -18,6 +32,22 @@ import {
 type Msg =
   | { role: "user"; text: string }
   | { role: "ai"; text: string; proposal?: { copy: Copy; changes: string[]; why: string; state: "open" | "applied" | "kept" } };
+
+function ComposerAttachments() {
+  const attachments = usePromptInputAttachments();
+  if (!attachments.files.length) return null;
+  return (
+    <div className="flex flex-wrap gap-2 px-3 pt-3">
+      {attachments.files.map((file) => (
+        <div key={file.id} className="flex max-w-48 items-center gap-2 rounded-md border border-border bg-muted/55 px-2 py-1.5 text-[11px] text-card-foreground">
+          {file.mediaType?.startsWith("image/") ? <Image size={14} /> : file.mediaType?.startsWith("video/") ? <Video size={14} /> : <FileText size={14} />}
+          <span className="truncate">{file.filename ?? "Attachment"}</span>
+          <Button type="button" variant="ghost" size="icon-sm" className="size-5" onClick={() => attachments.remove(file.id)} aria-label={`Remove ${file.filename ?? "attachment"}`}><X size={12} /></Button>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function copyText(copy: Copy) {
   return copy.kind === "text"
@@ -126,11 +156,11 @@ export function AiEditPanel({
   return (
     <div className={embedded ? "h-full min-h-[520px]" : `fixed inset-0 grid place-items-center bg-foreground/25 p-3 backdrop-blur-[3px] sm:p-6 ${className}`} onMouseDown={(event) => !embedded && event.target === event.currentTarget && onClose()}>
     <aside role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : "true"} aria-label="Directful AI" className={`ai-rise relative flex w-full flex-col overflow-hidden border border-border bg-card ${embedded ? "h-full min-h-[520px] rounded-lg shadow-card" : "max-h-[min(86vh,50rem)] max-w-[48rem] rounded-xl shadow-float"}`}>
-      <header className="flex items-center justify-between gap-4 border-b border-border px-4 py-3.5 sm:px-5">
+      <header className="flex items-center justify-between gap-4 border-b border-border/70 px-4 py-3.5 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <AiMark size={32} />
-          <div className="min-w-0"><p className="text-[13.5px] font-semibold text-card-foreground">Directful AI</p>
-          <p className="truncate text-[11px] text-muted-foreground">{title} · {copy.kind === "email" ? "Email" : "Text"}</p></div>
+          <div className="min-w-0"><p className="text-[13.5px] font-semibold text-card-foreground">AI content editor</p>
+          <p className="truncate text-[11px] text-muted-foreground">Editing {title} · {copy.kind === "email" ? "Email" : "Text"}</p></div>
         </div>
         <div className="flex items-center gap-1">
           {onMinimize && <Button variant="ghost" size="icon" onClick={onMinimize} aria-label="Minimize Directful AI"><Minimize2 size={16} /></Button>}
@@ -138,13 +168,13 @@ export function AiEditPanel({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-4 py-6 sm:px-6">
+      <div className="min-h-0 flex-1 space-y-7 overflow-y-auto px-4 py-7 sm:px-8">
         {msgs.map((m, idx) =>
           m.role === "user" ? (
-            <div key={idx} className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-[12.5px] text-primary-foreground">{m.text}</div>
+            <Message key={idx} from="user" className="max-w-[85%]"><MessageContent className="bg-primary px-3 py-2 text-[12.5px] text-primary-foreground"><MessageResponse>{m.text}</MessageResponse></MessageContent></Message>
           ) : (
             <div key={idx} className="space-y-3">
-              <div className="flex gap-3 text-[12.5px] leading-relaxed text-card-foreground"><AiMark size={26} /><p className="pt-1">{m.text}</p></div>
+              <Message from="assistant" className="max-w-full"><MessageContent className="w-full bg-transparent p-0"><div className="flex gap-3 text-[12.5px] leading-relaxed text-card-foreground"><AiMark size={26} /><MessageResponse className="pt-1">{m.text}</MessageResponse></div></MessageContent></Message>
               {m.proposal && (
                 <div className={`ml-9 rounded-lg border bg-canvas/45 ${m.proposal.state === "open" ? "border-brand/30 shadow-card" : "border-border opacity-70"}`}>
                   <div className="flex items-center justify-between border-b border-border px-3 py-2">
@@ -192,12 +222,17 @@ export function AiEditPanel({
         <div ref={endRef} />
       </div>
 
-      <div className="border-t border-border bg-canvas/55 px-4 py-3 sm:px-5">
-        <Button variant="ghost" size="sm" onClick={() => setShowPersonalize((v) => !v)} className="mb-2 px-2 text-[12px]">
+      <div className="border-t border-border/70 bg-card px-4 pb-4 pt-3 sm:px-6 sm:pb-5">
+        <div className="mb-2 flex items-center gap-1 overflow-x-auto pb-1">
+          <Button variant="ghost" size="sm" onClick={() => setShowPersonalize((v) => !v)} className="shrink-0 px-2 text-[12px]">
           <SlidersHorizontal size={13} />Personalize<ChevronDown size={13} className={`transition-transform ${showPersonalize ? "rotate-180" : ""}`} />
-        </Button>
+          </Button>
+          {EDIT_QUICK_ACTIONS.filter((a) => copy.kind === "email" || !/subject|text version/i.test(a)).slice(0, 4).map((a) => (
+            <button key={a} className={`${chip(false)} shrink-0 bg-background`} onClick={() => ask(a)}>{a}</button>
+          ))}
+        </div>
         {showPersonalize && (
-          <div className="mb-3 space-y-2 rounded-md border border-border p-2.5">
+          <div className="mb-3 space-y-2 rounded-lg border border-border bg-canvas/45 p-3">
             {([["Tone", "tone", TONES], ["Length", "length", LENGTHS], ["Focus", "focus", FOCUSES]] as const).map(([label, key, opts]) => (
               <div key={key}>
                 <p className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
@@ -211,29 +246,48 @@ export function AiEditPanel({
             </Button>
           </div>
         )}
-        <div className="mb-2 flex max-h-[76px] flex-wrap gap-1.5 overflow-y-auto">
-          {EDIT_QUICK_ACTIONS.filter((a) => copy.kind === "email" || !/subject|text version/i.test(a)).map((a) => (
-            <button key={a} className={chip(false)} onClick={() => ask(a)}>{a}</button>
-          ))}
-        </div>
-        <form onSubmit={(e) => { e.preventDefault(); ask(input); }} className="rounded-lg border border-border bg-card p-2 shadow-lift transition-colors focus-within:border-brand">
-          <textarea
+        <TooltipProvider><PromptInput
+          accept="image/*,video/*,application/pdf,text/plain,.doc,.docx,.ppt,.pptx"
+          multiple
+          maxFiles={6}
+          maxFileSize={20 * 1024 * 1024}
+          onSubmit={({ text, files }) => {
+            const attachmentNote = files.length ? `${text ? "\n\n" : ""}Use attached ${files.map((file) => file.filename ?? "file").join(", ")}.` : "";
+            ask(`${text}${attachmentNote}`);
+          }}
+          className="[&_[data-slot=input-group]]:rounded-xl [&_[data-slot=input-group]]:border-border [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:shadow-lift [&_[data-slot=input-group]]:focus-within:border-brand"
+        >
+          <ComposerAttachments />
+          <PromptInputTextarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(input); } }}
-            rows={2}
-            placeholder="Ask Directful AI to refine this content…"
-            className="min-h-16 w-full resize-none bg-transparent px-2 py-1.5 text-[13px] outline-none"
+            placeholder="Ask AI to refine this content…"
+            className="min-h-20 px-4 py-3 text-[13px]"
           />
-          <div className="mt-1 flex items-center justify-between gap-2 border-t border-border/70 pt-2">
-            <Button type="button" size="sm" variant="ghost" title="Add media from your library"><ImagePlus size={14} />Add media</Button>
-            <Button type="submit" size="icon" variant="brand" className="size-8" disabled={!input.trim()} aria-label="Send"><ArrowUp size={14} /></Button>
-          </div>
-        </form>
-        <p className="mt-1.5 text-center text-[10.5px] text-muted-foreground">Nothing changes until you apply it.</p>
+          <PromptInputFooter className="border-t border-border/60 px-2.5 pb-2.5 pt-2">
+            <PromptInputTools>
+              <PromptInputActionMenu>
+                <PromptInputActionMenuTrigger className="size-8 rounded-md border border-border bg-background shadow-card" tooltip="Add photos, video, or files"><Plus size={17} /></PromptInputActionMenuTrigger>
+                <PromptInputActionMenuContent className="w-52 p-1.5">
+                  <AttachmentMenuItem icon={<Image size={15} />} label="Add photos" />
+                  <AttachmentMenuItem icon={<Video size={15} />} label="Add video" />
+                  <AttachmentMenuItem icon={<Paperclip size={15} />} label="Add files" />
+                </PromptInputActionMenuContent>
+              </PromptInputActionMenu>
+              <span className="hidden text-[11px] text-muted-foreground sm:inline">Photos, video, or files</span>
+            </PromptInputTools>
+            <PromptInputSubmit status="ready" className="size-9 rounded-md bg-foreground text-background hover:bg-foreground/90" disabled={!input.trim()} />
+          </PromptInputFooter>
+        </PromptInput></TooltipProvider>
+        <p className="mt-2 text-center text-[10.5px] text-muted-foreground">Review every suggestion before it changes your content.</p>
       </div>
     </aside>
     </div>
   );
+}
+
+function AttachmentMenuItem({ icon, label }: { icon: React.ReactNode; label: string }) {
+  const attachments = usePromptInputAttachments();
+  return <PromptInputActionMenuItem onSelect={(event) => { event.preventDefault(); attachments.openFileDialog(); }}>{icon}{label}</PromptInputActionMenuItem>;
 }
