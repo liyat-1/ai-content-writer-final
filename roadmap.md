@@ -190,4 +190,4 @@
 - [x] Restore a richer generation state and allow publishing the complete timeframe without mandatory review
 - [x] Give generated cards channel/audience previews and a single Review action
 - [x] Embed AI editing inside the review's dynamic panel instead of opening a second popup
-- [ ] Verify the complete release flow at desktop and narrow widths
+- [x] Verify the complete release flow at desktop and narrow widths

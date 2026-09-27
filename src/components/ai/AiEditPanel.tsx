@@ -161,7 +161,7 @@ export function AiEditPanel({
                   </details>
                   {m.proposal.state === "open" && (
                     <div className="flex flex-wrap gap-1.5 border-t border-border px-3 py-2.5">
-                      <Button size="sm" variant="brand" onClick={() => { onApply(m.proposal!.copy); setState(idx, "applied"); }}><Check size={13} />Apply changes</Button>
+                       <Button size="sm" variant="brand" onClick={() => { if (!m.proposal) return; onApply(m.proposal.copy); setState(idx, "applied"); }}><Check size={13} />Apply changes</Button>
                       <Button size="sm" variant="outline" onClick={() => { setState(idx, "kept"); setFeedbackFor(idx); }}>Keep current</Button>
                       <Button size="sm" variant="ghost" onClick={() => ask(lastRequest, { retry: true })}><RefreshCw size={12} />Try another</Button>
                       <Button size="sm" variant="ghost" onClick={() => setCompareIdx(compareIdx === idx ? null : idx)}><GitCompare size={12} />{compareIdx === idx ? "Hide changes" : "Compare"}</Button>
