@@ -218,5 +218,12 @@
 
 - [ ] Clarify year-round fallback and seasonal replacement periods in the publication selector
 - [ ] Show per-campaign property adoption as one plain-language sentence
+
+## Full AI planning mode
+
+- [ ] Open Edit content with AI as a focused full workspace without the Content Library heading
+- [ ] Minimize AI into a side panel while keeping the calendar and campaigns visible
+- [ ] Close AI back to the original published-content view and reopen in full mode
+- [ ] Verify full, minimized, restored, and closed states at desktop and mobile widths
 - [ ] Restyle full and minimized AI modes from the supplied airy split-workspace references
 - [ ] Verify publication selection and both AI modes at desktop and mobile widths

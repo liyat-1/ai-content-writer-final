@@ -15,3 +15,5 @@
 - Content release data lives in src/lib/releases.ts as one mock source for Content, Releases and Results.
 - Releases and Results use one selected publication and its matching prior-period comparison; avoid unrelated analytics hierarchies.
 - The year-round foundation remains live underneath seasonal publications; uncovered future months automatically use it until AI content is explicitly scheduled.
+- AI editing transcripts and attachment composer controls use the installed AI Elements primitives so chat behavior stays accessible and consistent.
+- Package AI planning opens as the sole full workspace, minimizes beside the calendar without resetting, and closes back to published content.
