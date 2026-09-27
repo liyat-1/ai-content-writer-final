@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Check, ChevronDown, GitCompare, ImagePlus, Minimize2, RefreshCw, SlidersHorizontal, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AiMark } from "@/components/content/shared";
 import { Sparkle } from "./Sparkle";
 import {
   EDIT_QUICK_ACTIONS,
@@ -124,12 +125,12 @@ export function AiEditPanel({
 
   return (
     <div className={embedded ? "h-full min-h-[520px]" : `fixed inset-0 grid place-items-center bg-foreground/25 p-3 backdrop-blur-[3px] sm:p-6 ${className}`} onMouseDown={(event) => !embedded && event.target === event.currentTarget && onClose()}>
-    <aside role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : "true"} aria-label="Directful AI" className={`ai-rise relative flex w-full flex-col overflow-hidden border border-brand/25 bg-card/95 ${embedded ? "h-full min-h-[520px] rounded-md shadow-none" : "max-h-[min(82vh,46rem)] max-w-[44rem] rounded-xl shadow-float backdrop-blur-xl"}`}>
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand" />
-      <header className="flex items-start justify-between gap-3 border-b border-border bg-card px-4 py-3.5 sm:px-5">
-        <div className="min-w-0">
-          <p className="flex items-center gap-1.5 text-[14px] font-semibold text-card-foreground"><Sparkle className="text-brand" size={15} />Directful AI</p>
-          <p className="truncate text-[11.5px] text-muted-foreground">{title} · {copy.kind === "email" ? "Email" : "Text"}</p>
+    <aside role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : "true"} aria-label="Directful AI" className={`ai-rise relative flex w-full flex-col overflow-hidden border border-border bg-card ${embedded ? "h-full min-h-[520px] rounded-lg shadow-card" : "max-h-[min(86vh,50rem)] max-w-[48rem] rounded-xl shadow-float"}`}>
+      <header className="flex items-center justify-between gap-4 border-b border-border px-4 py-3.5 sm:px-5">
+        <div className="flex min-w-0 items-center gap-3">
+          <AiMark size={32} />
+          <div className="min-w-0"><p className="text-[13.5px] font-semibold text-card-foreground">Directful AI</p>
+          <p className="truncate text-[11px] text-muted-foreground">{title} · {copy.kind === "email" ? "Email" : "Text"}</p></div>
         </div>
         <div className="flex items-center gap-1">
           {onMinimize && <Button variant="ghost" size="icon" onClick={onMinimize} aria-label="Minimize Directful AI"><Minimize2 size={16} /></Button>}
@@ -137,15 +138,15 @@ export function AiEditPanel({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-canvas/45 px-4 py-5 sm:px-5">
+      <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-4 py-6 sm:px-6">
         {msgs.map((m, idx) =>
           m.role === "user" ? (
             <div key={idx} className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-[12.5px] text-primary-foreground">{m.text}</div>
           ) : (
-            <div key={idx} className="space-y-2">
-              <p className="flex gap-2 text-[12.5px] leading-relaxed text-card-foreground"><span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-md bg-brand-soft text-brand"><Sparkle size={12} /></span><span className="pt-1">{m.text}</span></p>
+            <div key={idx} className="space-y-3">
+              <div className="flex gap-3 text-[12.5px] leading-relaxed text-card-foreground"><AiMark size={26} /><p className="pt-1">{m.text}</p></div>
               {m.proposal && (
-                <div className={`rounded-md border ${m.proposal.state === "open" ? "border-brand/40" : "border-border opacity-70"}`}>
+                <div className={`ml-9 rounded-lg border bg-canvas/45 ${m.proposal.state === "open" ? "border-brand/30 shadow-card" : "border-border opacity-70"}`}>
                   <div className="flex items-center justify-between border-b border-border px-3 py-2">
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Suggested update</p>
                     {m.proposal.state !== "open" && <span className="text-[11px] text-muted-foreground">{m.proposal.state === "applied" ? "Applied" : "Not used"}</span>}
@@ -191,10 +192,10 @@ export function AiEditPanel({
         <div ref={endRef} />
       </div>
 
-      <div className="border-t border-border bg-card px-4 py-3 sm:px-5">
-        <button onClick={() => setShowPersonalize((v) => !v)} className="mb-2 flex items-center gap-1.5 text-[12px] font-medium text-card-foreground">
+      <div className="border-t border-border bg-canvas/55 px-4 py-3 sm:px-5">
+        <Button variant="ghost" size="sm" onClick={() => setShowPersonalize((v) => !v)} className="mb-2 px-2 text-[12px]">
           <SlidersHorizontal size={13} />Personalize<ChevronDown size={13} className={`transition-transform ${showPersonalize ? "rotate-180" : ""}`} />
-        </button>
+        </Button>
         {showPersonalize && (
           <div className="mb-3 space-y-2 rounded-md border border-border p-2.5">
             {([["Tone", "tone", TONES], ["Length", "length", LENGTHS], ["Focus", "focus", FOCUSES]] as const).map(([label, key, opts]) => (
@@ -215,7 +216,7 @@ export function AiEditPanel({
             <button key={a} className={chip(false)} onClick={() => ask(a)}>{a}</button>
           ))}
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); ask(input); }} className="rounded-lg border border-brand/30 bg-background p-2 shadow-card focus-within:border-brand">
+        <form onSubmit={(e) => { e.preventDefault(); ask(input); }} className="rounded-lg border border-border bg-card p-2 shadow-lift transition-colors focus-within:border-brand">
           <textarea
             ref={inputRef}
             value={input}
@@ -230,7 +231,7 @@ export function AiEditPanel({
             <Button type="submit" size="icon" variant="brand" className="size-8" disabled={!input.trim()} aria-label="Send"><ArrowUp size={14} /></Button>
           </div>
         </form>
-        <p className="mt-1.5 text-[10.5px] text-muted-foreground">Directful AI only suggests content — nothing is published or replaced until you apply it.</p>
+        <p className="mt-1.5 text-center text-[10.5px] text-muted-foreground">Nothing changes until you apply it.</p>
       </div>
     </aside>
     </div>

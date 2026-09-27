@@ -213,3 +213,10 @@
 - [x] Use click rate, click-to-book, and spam rate with concise AI explanations and external factors
 - [x] Remove confidence, voting, unrelated metrics, and extra reporting navigation
 - [x] Verify Content, Releases, Results, and publication switching at desktop and mobile widths
+
+## Publication coverage and AI workspace polish
+
+- [ ] Clarify year-round fallback and seasonal replacement periods in the publication selector
+- [ ] Show per-campaign property adoption as one plain-language sentence
+- [ ] Restyle full and minimized AI modes from the supplied airy split-workspace references
+- [ ] Verify publication selection and both AI modes at desktop and mobile widths

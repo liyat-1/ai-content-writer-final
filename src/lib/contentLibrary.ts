@@ -214,8 +214,8 @@ export const MONTH_PACKAGES: MonthPackage[] = [
   { id: "sep-edit", month: 8, year: 2026, label: "Autumn refined", version: "v3.1", source: "team", status: "Live now", note: "Edited Sep 12 by Sevket Yilmaz" },
   { id: "oct-default", month: 9, year: 2026, label: "Original year-round", version: "v1", source: "default", status: "Archived", note: "Fallback content" },
   { id: "oct-ai", month: 9, year: 2026, label: "October city break", version: "v4", source: "ai", status: "Scheduled", note: "Scheduled for Oct 1" },
-  { id: "nov-default", month: 10, year: 2026, label: "Original year-round", version: "v1", source: "default", status: "Archived", note: "Fallback content" },
-  { id: "nov-ai", month: 10, year: 2026, label: "Holiday season", version: "v5", source: "ai", status: "Scheduled", note: "Scheduled for Nov 1" },
+  { id: "nov-default", month: 10, year: 2026, label: "Year-round foundation", version: "v1", source: "default", status: "Scheduled", note: "Starts when the autumn publication ends" },
+  { id: "dec-default", month: 11, year: 2026, label: "Year-round foundation", version: "v1", source: "default", status: "Scheduled", note: "No seasonal publication scheduled" },
 ];
 
 export function packageSnippet(campaign: LibraryCampaign, pack: MonthPackage, segment: Segment = "direct") {

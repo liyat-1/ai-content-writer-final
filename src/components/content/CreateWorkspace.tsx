@@ -65,7 +65,7 @@ export function CreateWorkspace() {
   const year = 2026 + Math.floor((START_MONTH + offset) / 12);
   const monthName = new Intl.DateTimeFormat("en", { month: "long", timeZone: "UTC" }).format(new Date(Date.UTC(year, month, 1)));
   const packages = useMemo(() => MONTH_PACKAGES.filter((pack) => pack.month === month && pack.year === year), [month, year]);
-  const [selectedPackages, setSelectedPackages] = useState<Record<string, string>>({ "8-2026": "sep-live", "9-2026": "oct-ai", "10-2026": "nov-ai" });
+  const [selectedPackages, setSelectedPackages] = useState<Record<string, string>>({ "8-2026": "sep-live", "9-2026": "oct-ai", "10-2026": "nov-default", "11-2026": "dec-default" });
   const selectedPack = packages.find((pack) => pack.id === selectedPackages[`${month}-${year}`]) ?? packages[0] ?? { id: "default", month, year, label: "Original year-round", version: "v1", source: "default" as const, status: offset === 0 ? "Live now" as const : "Scheduled" as const, note: "Fallback content" };
   const reviewId = (id: string) => libraryCampaigns.find((campaign) => EDITOR_ID[campaign.id] === id && (campaign.status === "Needs review" || campaign.status === "Approved"))?.id;
   const top = topRelease(month, Boolean(ui.reverted[month]));
