@@ -1,34 +1,26 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, BarChart3, CalendarDays, Check, ChevronRight, Clock3, Layers3, Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
+import { ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Check, ChevronDown, ChevronRight, Clock3, Mail, MessageSquare, Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
 import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { Button } from "@/components/ui/button";
 import { MONTHS } from "@/lib/contentLibrary";
 import { useMarketing } from "@/lib/marketing";
-import { ACTIVE_RELEASE_ID, CONFIDENCE, RELEASE_RESULTS, RELEASES, TOTAL_PROPERTIES, useSelectedRelease, versionsFor, type Confidence, type Release } from "@/lib/releases";
+import { ACTIVE_RELEASE_ID, RELEASE_RESULTS, RELEASES, TOTAL_PROPERTIES, useSelectedRelease, versionsFor, type Release } from "@/lib/releases";
 
 type DetailView = "overview" | "months" | "campaigns";
 
 const panel = "rounded-lg border border-border bg-card shadow-card";
 
-function ConfidenceTag({ c }: { c: Confidence }) {
-  return <span className={`rounded-sm px-2 py-1 text-[10px] font-semibold ${CONFIDENCE[c].cls}`}>{CONFIDENCE[c].label}</span>;
-}
-
 function PublicationHistory({ selectedId, onSelect }: { selectedId: string; onSelect: (id: string) => void }) {
   const years = Array.from(new Set(RELEASES.map((release) => release.year))).sort((a, b) => b - a);
   return (
-    <aside className="lg:sticky lg:top-[76px] lg:self-start" aria-label="Publication history">
-      <div className={`${panel} overflow-hidden`}>
-        <div className="border-b border-border px-4 py-4">
-          <p className="text-[11px] font-semibold uppercase text-muted-foreground">Publication history</p>
-          <p className="mt-1 text-[12px] text-muted-foreground">Choose one publication to view.</p>
-        </div>
-        <div className="max-h-[calc(100vh-190px)] overflow-y-auto p-2">
+    <section aria-label="Publication history">
+      <div className="mb-3 flex items-end justify-between gap-3"><div><p className="text-[11px] font-semibold uppercase text-brand">Publication ledger</p><h2 className="mt-1 text-[18px] font-semibold text-card-foreground">Versions by publication date</h2></div><p className="text-[11px] text-muted-foreground">Select a publication to inspect it</p></div>
+      <div className="space-y-5 border-l-2 border-border pl-5">
           {years.map((year) => (
             <section key={year} className="mb-3 last:mb-0">
-              <p className="px-2 py-2 text-[11px] font-bold text-card-foreground">{year}</p>
-              <div className="space-y-1">
+              <p className="mb-2 text-[11px] font-bold text-muted-foreground">{year}</p>
+              <div className="space-y-2">
                 {RELEASES.filter((release) => release.year === year).map((release) => {
                   const selected = release.id === selectedId;
                   const active = release.id === ACTIVE_RELEASE_ID;
@@ -37,26 +29,18 @@ function PublicationHistory({ selectedId, onSelect }: { selectedId: string; onSe
                       type="button"
                       key={release.id}
                       onClick={() => onSelect(release.id)}
-                      className={`w-full rounded-md border px-3 py-3 text-left transition-all duration-200 ${selected ? "border-brand bg-brand-soft shadow-card" : "border-transparent hover:border-border hover:bg-muted/60"}`}
+                      className={`relative grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-md border px-4 py-4 text-left transition-all duration-200 before:absolute before:-left-[27px] before:size-3 before:rounded-sm before:border-2 before:border-card ${selected ? "border-brand bg-card shadow-lift before:bg-brand" : "border-border bg-card hover:border-brand/40 hover:shadow-card before:bg-muted"}`}
                     >
-                      <span className="flex items-start gap-2">
-                        <span className={`mt-1.5 size-2 shrink-0 rounded-full ${active ? "bg-brand" : "bg-muted-foreground/35"}`} />
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[12.5px] font-semibold text-card-foreground">{release.name}</span>
-                          <span className="mt-1 block text-[10.5px] text-muted-foreground">Published {release.created} · {release.source}</span>
-                          {active && <span className="mt-2 inline-flex items-center gap-1 rounded-sm bg-brand px-1.5 py-0.5 text-[9.5px] font-semibold text-brand-foreground"><span className="size-1 rounded-full bg-brand-foreground" />Live now</span>}
-                        </span>
-                        {selected && <ChevronRight size={14} className="mt-0.5 shrink-0 text-brand" />}
-                      </span>
+                      <span className="min-w-0"><span className="flex flex-wrap items-center gap-2"><span className="text-[14px] font-semibold text-card-foreground">{release.name}</span><span className={`rounded-sm px-2 py-0.5 text-[9.5px] font-semibold ${active ? "bg-brand text-brand-foreground" : release.status === "Scheduled" ? "bg-brand-soft text-brand" : "bg-muted text-muted-foreground"}`}>{active ? "Live now" : release.status}</span></span><span className="mt-1 block text-[10.5px] text-muted-foreground">{release.source} · Published {release.created} · Covers {MONTHS[release.from]}–{MONTHS[release.to]} · {release.campaignCount} campaigns</span>{selected && <span className="mt-3 block text-[11.5px] leading-5 text-card-foreground">{release.summary}</span>}</span>
+                      <span className="flex items-center gap-4"><span className="hidden text-right sm:block"><span className="block text-[16px] font-semibold text-card-foreground">{release.properties}</span><span className="text-[9.5px] text-muted-foreground">properties</span></span>{selected ? <ChevronDown size={15} className="text-brand" /> : <ChevronRight size={15} className="text-muted-foreground" />}</span>
                     </button>
                   );
                 })}
               </div>
             </section>
           ))}
-        </div>
       </div>
-    </aside>
+    </section>
   );
 }
 
@@ -145,20 +129,17 @@ function ReleaseOverview({ release, onView }: { release: Release; onView: (view:
 }
 
 function ReleaseMonths({ release, campaigns, onCampaign }: { release: Release; campaigns: ReturnType<typeof useMarketing>["campaigns"]; onCampaign: (id: string, month: number) => void }) {
-  const [month, setMonth] = useState(release.from);
+  const result = RELEASE_RESULTS[release.id] ?? RELEASE_RESULTS.default;
   return (
-    <section className={panel}>
-      <div className="flex gap-2 overflow-x-auto border-b border-border p-3">
-        {Array.from({ length: release.to - release.from + 1 }, (_, index) => release.from + index).map((item) => <button key={item} type="button" onClick={() => setMonth(item)} className={`min-w-[110px] rounded-md border px-3 py-2.5 text-left transition-colors ${month === item ? "border-brand bg-brand-soft" : "border-border hover:bg-muted"}`}><span className="block text-[12px] font-semibold text-card-foreground">{MONTHS[item]}</span><span className="mt-0.5 block text-[10px] text-muted-foreground">{campaigns.length} campaigns</span></button>)}
-      </div>
-      <div className="px-4 py-3"><p className="text-[11px] text-muted-foreground">Live content for <span className="font-semibold text-card-foreground">{MONTHS[month]} {release.year}</span></p></div>
-      <CampaignRows campaigns={campaigns} release={release} month={month} onCampaign={onCampaign} />
-    </section>
+    <section><div className="mb-4"><h3 className="text-[16px] font-semibold text-card-foreground">Monthly breakdown</h3><p className="mt-1 text-[11px] text-muted-foreground">Every month stays attached to {release.name}.</p></div><div className="grid gap-4 xl:grid-cols-3">{result.months.map((item, index) => { const previous = Math.round(item.clicks / (1 + (index === result.months.length - 1 ? -.06 : .18 + index * .05))); const up = item.clicks >= previous; return <article key={item.month} className={`${panel} overflow-hidden`}><div className="border-t-[3px] border-brand p-5"><div className="flex items-start justify-between gap-3"><h4 className="text-[22px] font-semibold text-card-foreground">{MONTHS[item.month]} {release.year}</h4><span className={`flex items-center gap-1 text-[11px] font-semibold ${up ? "text-brand" : "text-destructive"}`}>{up ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}{item.clicks ? `${Math.abs(Math.round((item.clicks - previous) / Math.max(previous, 1) * 100))}% vs comparison` : "Not live"}</span></div><div className="mt-4 grid grid-cols-3 gap-2"><MiniStat label="Clicks" value={item.clicks ? item.clicks.toLocaleString() : "—"} note={item.clicks ? `Prior ${previous.toLocaleString()}` : "Scheduled"} /><MiniStat label="Engagement" value={item.engagement ? `${item.engagement.toFixed(1)}%` : "—"} note={release.comparison} /><MiniStat label="Calls" value={item.calls ? item.calls.toLocaleString() : "—"} note={item.clicks ? "Attributed" : "Scheduled"} /></div><button type="button" onClick={() => onCampaign(campaigns[0]?.id ?? "", item.month)} className="mt-4 flex w-full items-start gap-3 rounded-md bg-brand-soft/70 p-3 text-left"><Sparkles size={14} className="mt-0.5 shrink-0 text-brand" /><span className="text-[11.5px] leading-5 text-card-foreground">{item.clicks ? index === 0 ? "Seasonal content is outperforming the comparable period; event-led campaigns are leading clicks." : "Guest engagement stayed strongest where the message named a timely local reason to return." : "This month is scheduled. Results will appear after the first messages are sent."}</span></button></div></article>; })}</div></section>
   );
 }
 
+function MiniStat({ label, value, note }: { label: string; value: string; note: string }) { return <div className="rounded-md bg-muted/55 p-3"><p className="text-[9.5px] text-muted-foreground">{label}</p><p className="mt-1 text-[16px] font-semibold text-card-foreground">{value}</p><p className="mt-1 truncate text-[9px] text-muted-foreground">{note}</p></div>; }
+
 function CampaignRows({ campaigns, release, month, onCampaign }: { campaigns: ReturnType<typeof useMarketing>["campaigns"]; release: Release; month: number; onCampaign: (id: string, month: number) => void }) {
-  return <ul className="divide-y divide-border border-t border-border">{campaigns.map((campaign, index) => { const versions = versionsFor(campaign.id, month); const version = release.id === ACTIVE_RELEASE_ID ? versions[0]?.v ?? 1 : 1; return <li key={campaign.id}><button type="button" onClick={() => onCampaign(campaign.id, month)} className="grid w-full grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/50 sm:grid-cols-[1.2fr_.8fr_auto]"><span><span className="block text-[12.5px] font-semibold text-card-foreground">{campaign.name}</span><span className="block text-[10.5px] text-muted-foreground">{campaign.timing}</span></span><span className="hidden text-[11px] text-muted-foreground sm:block">{campaign.strategy === "text" ? "Text" : "Text + Email"}</span><span className="flex items-center gap-2"><span className="rounded-sm bg-muted px-2 py-1 text-[10px] font-semibold text-card-foreground">v{version}</span>{index < 3 && release.id === ACTIVE_RELEASE_ID && <span className="hidden text-[10px] font-medium text-brand md:inline">Changed</span>}<ChevronRight size={14} className="text-muted-foreground" /></span></button></li>; })}</ul>;
+  const results = RELEASE_RESULTS[release.id] ?? RELEASE_RESULTS.default;
+  return <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{campaigns.map((campaign, index) => { const versions = versionsFor(campaign.id, month); const version = release.id === ACTIVE_RELEASE_ID ? versions[0]?.v ?? 1 : 1; const metric = results.campaigns.find((item) => item.campaignId === campaign.id); return <button key={campaign.id} type="button" onClick={() => onCampaign(campaign.id, month)} className={`${panel} overflow-hidden text-left transition-all hover:border-brand/40 hover:shadow-lift`}><div className="h-1 bg-brand" /><div className="p-4"><div className="flex items-start justify-between gap-3"><div><span className="text-[13px] font-semibold text-card-foreground">{campaign.name}</span><span className="mt-1 block text-[10px] text-muted-foreground">{campaign.timing}</span></div><span className="rounded-sm bg-brand-soft px-2 py-1 text-[10px] font-semibold text-brand">v{version}</span></div><div className="mt-4 grid grid-cols-3 gap-2"><MiniStat label="Clicks" value={metric ? metric.clicks.toLocaleString() : "—"} note="This release" /><MiniStat label="Engagement" value={metric ? `${metric.engagement.toFixed(1)}%` : "—"} note="Guest actions" /><MiniStat label="Lift" value={metric ? `+${metric.lift.toFixed(1)} pts` : "—"} note="vs comparison" /></div><div className="mt-3 flex items-center gap-2 border-t border-border pt-3 text-[10.5px] text-muted-foreground">{campaign.strategy === "text" ? <MessageSquare size={12} /> : <><MessageSquare size={12} /><Mail size={12} /></>}<span>{campaign.strategy === "text" ? "Text" : "Email + Text"}</span>{index < 3 && release.id === ACTIVE_RELEASE_ID && <span className="ml-auto font-semibold text-brand">Changed</span>}<ChevronRight size={13} className="ml-auto" /></div></div></button>; })}</div>;
 }
 
 function VersionDetail({ campaignId, month, campaignName, onBack }: { campaignId: string; month: number; campaignName: string; onBack: () => void }) {
@@ -182,7 +163,7 @@ function PublicationWorkspace({ page }: { page: "releases" | "results" }) {
     <MarketingShell title={page === "releases" ? "Releases" : "Results"}>
       <main className="mx-auto max-w-[1240px] px-4 pb-16 pt-6 sm:px-6 lg:px-8">
         <PageHeader page={page === "releases" ? "Releases" : "Results"} release={release} />
-        <div className="mt-6 grid gap-5 lg:grid-cols-[250px_minmax(0,1fr)]">
+        <div className="mt-6 space-y-6">
           <PublicationHistory selectedId={release.id} onSelect={selectRelease} />
           <div className="min-w-0 space-y-5">
             <PublicationHero release={release} page={page === "releases" ? "release" : "results"} />
@@ -190,15 +171,15 @@ function PublicationWorkspace({ page }: { page: "releases" | "results" }) {
 
             {page === "releases" && view === "overview" && <ReleaseOverview release={release} onView={setView} />}
             {page === "releases" && view === "months" && !campaignDrill && <ReleaseMonths key={release.id} release={release} campaigns={campaigns} onCampaign={openCampaign} />}
-            {page === "releases" && view === "campaigns" && !campaignDrill && <section className={panel}><div className="px-4 py-4"><h3 className="text-[14px] font-semibold text-card-foreground">All campaigns in {release.name}</h3><p className="mt-1 text-[11px] text-muted-foreground">Open any campaign to inspect the versions published in this release.</p></div><CampaignRows campaigns={campaigns} release={release} month={release.from} onCampaign={openCampaign} /></section>}
+            {page === "releases" && view === "campaigns" && !campaignDrill && <section><div className="mb-4"><h3 className="text-[16px] font-semibold text-card-foreground">Campaigns in {release.name}</h3><p className="mt-1 text-[11px] text-muted-foreground">Open any campaign to inspect its publication versions.</p></div><CampaignRows campaigns={campaigns} release={release} month={release.from} onCampaign={openCampaign} /></section>}
             {page === "releases" && campaignDrill && campaign && <VersionDetail campaignId={campaign.id} month={campaignDrill.month} campaignName={campaign.name} onBack={() => setCampaignDrill(null)} />}
 
             {page === "results" && view === "overview" && <>
               <div className="grid gap-3 sm:grid-cols-3">{result.metrics.map((metric) => <section key={metric.label} className={`${panel} p-4`}><p className="text-[10.5px] font-medium text-muted-foreground">{metric.label}</p><p className="mt-2 text-[26px] font-semibold text-card-foreground">{metric.value}</p><p className="mt-1 text-[11px] font-medium text-brand">{metric.delta}</p></section>)}</div>
-              <section className={`${panel} p-5 sm:p-6`}><div className="flex items-center gap-2"><Sparkles size={16} className="text-brand" /><h3 className="text-[14px] font-semibold text-card-foreground">AI insights for {release.name}</h3></div><p className="mt-1 text-[11px] text-muted-foreground">{result.sampleNote}</p><ul className="mt-4 divide-y divide-border">{result.insights.map((insight) => <li key={insight.id} className="py-4 first:pt-0 last:pb-0"><div className="flex items-center gap-2"><ConfidenceTag c={insight.conf} /><span className="ml-auto flex gap-1"><Button size="icon-sm" variant={votes[insight.id] === "up" ? "secondary" : "ghost"} aria-label="Helpful" onClick={() => setVotes((current) => ({ ...current, [insight.id]: "up" }))}><ThumbsUp size={13} /></Button><Button size="icon-sm" variant={votes[insight.id] === "down" ? "secondary" : "ghost"} aria-label="Not helpful" onClick={() => setVotes((current) => ({ ...current, [insight.id]: "down" }))}><ThumbsDown size={13} /></Button></span></div><p className="mt-2 text-[13px] font-medium text-card-foreground">{insight.text}</p><p className="mt-1 text-[11.5px] leading-5 text-muted-foreground"><span className="font-semibold text-card-foreground">Why we think this:</span> {insight.evidence}</p></li>)}</ul></section>
+              <section className={`${panel} p-5 sm:p-6`}><div className="flex items-center gap-2"><Sparkles size={16} className="text-brand" /><h3 className="text-[14px] font-semibold text-card-foreground">What the results say</h3><span className="ml-auto rounded-sm bg-muted px-2 py-1 text-[10px] text-muted-foreground">{result.sampleNote}</span></div><ul className="mt-4 divide-y divide-border">{result.insights.map((insight) => <li key={insight.id} className="py-4 first:pt-0 last:pb-0"><div className="flex items-start gap-3"><span className="grid size-7 shrink-0 place-items-center rounded-md bg-brand-soft text-brand"><Sparkles size={13} /></span><div className="min-w-0 flex-1"><p className="text-[13px] font-medium text-card-foreground">{insight.text}</p><p className="mt-1 text-[11.5px] leading-5 text-muted-foreground"><span className="font-semibold text-card-foreground">Why we think this:</span> {insight.evidence}</p></div><span className="flex shrink-0 gap-1"><Button size="icon-sm" variant={votes[insight.id] === "up" ? "secondary" : "ghost"} aria-label="Helpful" onClick={() => setVotes((current) => ({ ...current, [insight.id]: "up" }))}><ThumbsUp size={13} /></Button><Button size="icon-sm" variant={votes[insight.id] === "down" ? "secondary" : "ghost"} aria-label="Not helpful" onClick={() => setVotes((current) => ({ ...current, [insight.id]: "down" }))}><ThumbsDown size={13} /></Button></span></div></li>)}</ul></section>
             </>}
-            {page === "results" && view === "months" && <section className={`${panel} p-5 sm:p-6`}><div className="flex items-start justify-between gap-4"><div><h3 className="text-[14px] font-semibold text-card-foreground">Monthly performance</h3><p className="mt-1 text-[11px] text-muted-foreground">Clicks generated by {release.name}</p></div><span className="text-[10px] text-muted-foreground">{result.sampleNote}</span></div><div className="mt-7 flex h-56 items-end gap-3">{result.months.map((item) => <div key={item.month} className="flex min-w-0 flex-1 flex-col items-center gap-2"><span className="text-[10px] font-semibold text-card-foreground">{item.clicks ? item.clicks.toLocaleString() : "—"}</span><div className="flex h-40 w-full items-end rounded-sm bg-muted/60"><div className="w-full rounded-sm bg-brand transition-[height] duration-200" style={{ height: `${item.clicks ? Math.max(12, item.clicks / maxClicks * 100) : 4}%` }} /></div><span className="text-[10.5px] font-medium text-muted-foreground">{MONTHS[item.month]}</span></div>)}</div><div className="mt-5 grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">{result.months.map((item) => <Stat key={item.month} label={`${MONTHS[item.month]} engagement`} value={item.engagement ? `${item.engagement.toFixed(1)}% · ${item.calls} calls` : "Not live yet"} />)}</div></section>}
-            {page === "results" && view === "campaigns" && <section className={panel}><div className="px-4 py-4"><h3 className="text-[14px] font-semibold text-card-foreground">Campaign performance</h3><p className="mt-1 text-[11px] text-muted-foreground">Results attributable to {release.name} only.</p></div><div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left"><thead className="border-y border-border bg-muted/50 text-[10px] font-semibold uppercase text-muted-foreground"><tr><th className="px-4 py-3">Campaign</th><th className="px-4 py-3">Clicks</th><th className="px-4 py-3">Engagement</th><th className="px-4 py-3">Lift</th><th className="px-4 py-3">Confidence</th></tr></thead><tbody className="divide-y divide-border">{result.campaigns.map((row) => { const name = campaigns.find((item) => item.id === row.campaignId)?.name ?? row.campaignId; return <tr key={row.campaignId} className="hover:bg-muted/40"><td className="px-4 py-3 text-[12px] font-semibold text-card-foreground">{name}</td><td className="px-4 py-3 text-[12px] text-card-foreground">{row.clicks.toLocaleString()}</td><td className="px-4 py-3 text-[12px] text-card-foreground">{row.engagement.toFixed(1)}%</td><td className="px-4 py-3 text-[12px] font-semibold text-brand">+{row.lift.toFixed(1)} pts</td><td className="px-4 py-3"><ConfidenceTag c={row.confidence} /></td></tr>; })}</tbody></table></div></section>}
+            {page === "results" && view === "months" && <ReleaseMonths release={release} campaigns={campaigns} onCampaign={openCampaign} />}
+            {page === "results" && view === "campaigns" && <section><div className="mb-4"><h3 className="text-[16px] font-semibold text-card-foreground">Campaign results</h3><p className="mt-1 text-[11px] text-muted-foreground">Only activity attributed to {release.name} is shown.</p></div><CampaignRows campaigns={campaigns.filter((campaign) => result.campaigns.some((item) => item.campaignId === campaign.id))} release={release} month={release.from} onCampaign={openCampaign} /></section>}
 
             <div className="flex items-center justify-between border-t border-border pt-4 text-[11px] text-muted-foreground"><span className="flex items-center gap-1.5"><Clock3 size={13} />Publication data updated Sep 27, 2026</span><Link to={page === "releases" ? "/content/results" : "/content/releases"} className="flex items-center gap-1 font-semibold text-brand">{page === "releases" ? "View this publication’s results" : "View publication details"}<ArrowRight size={13} /></Link></div>
           </div>

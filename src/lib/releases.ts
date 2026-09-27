@@ -27,6 +27,15 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
+    id: "holiday-2026", name: "Holiday season 2026", year: 2026, from: 10, to: 11,
+    source: "AI generated", created: "Sep 27", publishedAt: "Sep 27, 2026 · 4:20 PM", status: "Scheduled",
+    properties: 27, campaignCount: 10, replaces: "September–November 2026",
+    summary: "A scheduled holiday publication for November and December with city-light, gifting, and winter-weekend stories.",
+    changes: ["Added holiday windows and Rockefeller Center", "Planned warmer winter imagery", "Moved November event messages earlier"],
+    expectedEffect: "Likely to protect November bookings by sending time-sensitive event messages earlier than last year.",
+    comparison: "Holiday 2025",
+  },
+  {
     id: "sep-nov-2026", name: "September–November 2026", year: 2026, from: 8, to: 10,
     source: "AI generated", created: "Sep 27", publishedAt: "Sep 27, 2026 · 2:14 PM", status: "Live",
     properties: 29, editedCampaigns: 1, campaignCount: 16, replaces: "Summer 2026",
@@ -117,6 +126,13 @@ const campaignResults = (scale: number, confidence: Confidence): ReleaseCampaign
 ];
 
 export const RELEASE_RESULTS: Record<string, ReleaseResult> = {
+  "holiday-2026": {
+    releaseId: "holiday-2026", measuredThrough: "Not live yet", sampleNote: "Scheduled publication · results begin after Nov 1",
+    metrics: [{ label: "Clicks", value: "—", delta: "Starts Nov 1" }, { label: "Engagement rate", value: "—", delta: "Starts Nov 1" }, { label: "Calls received", value: "—", delta: "Starts Nov 1" }],
+    months: [{ month: 10, clicks: 0, engagement: 0, calls: 0 }, { month: 11, clicks: 0, engagement: 0, calls: 0 }],
+    campaigns: campaignResults(0, "early"),
+    insights: [{ id: "h26", text: "Results will appear here after the publication starts on November 1.", evidence: "This publication is scheduled and has not sent any guest messages yet.", conf: "early" }],
+  },
   "sep-nov-2026": {
     releaseId: "sep-nov-2026", measuredThrough: "Sep 27, 2026", sampleNote: "3 days of the live publication · compared with Sep–Nov 2025",
     metrics: [{ label: "Clicks", value: "1,126", delta: "+14% vs the same first 3 days" }, { label: "Engagement rate", value: "7.9%", delta: "+0.8 pts vs Sep–Nov 2025" }, { label: "Calls received", value: "74", delta: "+9% vs the same first 3 days" }],
