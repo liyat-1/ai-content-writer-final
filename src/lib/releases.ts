@@ -57,7 +57,7 @@ export type Risk = "minor" | "angle" | "significant";
 export const RISK: Record<Risk, { label: string; dot: string; order: number }> = {
   significant: { label: "Significant change", dot: "bg-destructive", order: 0 },
   angle: { label: "New angle", dot: "bg-warning", order: 1 },
-  minor: { label: "Minor tone change", dot: "bg-success", order: 2 },
+  minor: { label: "Minor tone change", dot: "bg-brand", order: 2 },
 };
 const RISK_BY_CAMPAIGN: Record<string, Risk> = { "after-last-visit": "significant", "lost-3": "angle", "lost-6": "minor", "lost-9": "angle", "lost-12": "significant", "lost-15": "minor", "just-booked": "minor", "before-arrival": "angle", "during-stay": "minor", "post-checkout": "angle" };
 export const riskFor = (id: string): Risk => RISK_BY_CAMPAIGN[id] ?? "minor";
