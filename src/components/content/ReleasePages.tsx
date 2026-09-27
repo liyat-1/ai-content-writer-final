@@ -5,7 +5,7 @@ import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { Button } from "@/components/ui/button";
 import { MONTHS } from "@/lib/contentLibrary";
 import { useMarketing } from "@/lib/marketing";
-import { ACTIVE_RELEASE_ID, RELEASE_RESULTS, RELEASES, TOTAL_PROPERTIES, useSelectedRelease, type Release } from "@/lib/releases";
+import { ACTIVE_RELEASE_ID, RELEASE_RESULTS, RELEASES, TOTAL_PROPERTIES, campaignProperties, useSelectedRelease, type Release } from "@/lib/releases";
 
 const panel = "rounded-lg border border-border bg-card shadow-card";
 

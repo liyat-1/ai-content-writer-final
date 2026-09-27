@@ -93,6 +93,21 @@ export const RELEASES: Release[] = [
 
 export const ACTIVE_RELEASE_ID = "sep-nov-2026";
 
+/** Hotels using a publication per campaign (0 = none, TOTAL_PROPERTIES = all). */
+const adoption = (all: number, overrides: Record<string, number> = {}) => (id: string) => overrides[id] ?? all;
+export const RELEASE_CAMPAIGN_PROPERTIES: Record<string, (campaignId: string) => number> = {
+  "holiday-2026": adoption(27, { "lost-12": 0, "lost-15": 0, "lost-15-plus": 0, "no-show": 12 }),
+  "sep-nov-2026": adoption(29, { "just-booked": 29, "before-arrival": 29, "lost-15-plus": 4, cancelled: 0, "no-show": 0 }),
+  "summer-2026": adoption(31),
+  "winter-spring-2026": adoption(31, { "lost-15-plus": 9 }),
+  "holiday-2025": adoption(30, { "no-show": 0, cancelled: 18 }),
+  "sep-nov-2025": adoption(28, { "lost-15-plus": 0, review: 25 }),
+  default: adoption(31),
+};
+export function campaignProperties(releaseId: string, campaignId: string): number {
+  return (RELEASE_CAMPAIGN_PROPERTIES[releaseId] ?? adoption(TOTAL_PROPERTIES))(campaignId);
+}
+
 let selectedReleaseId = ACTIVE_RELEASE_ID;
 const selectionSubs = new Set<() => void>();
 export function useSelectedRelease() {
