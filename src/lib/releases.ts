@@ -29,7 +29,7 @@ export const RELEASES: Release[] = [
   {
     id: "sep-nov-2026", name: "September–November 2026", year: 2026, from: 8, to: 10,
     source: "AI generated", created: "Sep 27", publishedAt: "Sep 27, 2026 · 2:14 PM", status: "Live",
-    properties: 29, editedCampaigns: 1, campaignCount: 11, replaces: "Summer 2026",
+    properties: 29, editedCampaigns: 1, campaignCount: 16, replaces: "Summer 2026",
     summary: "A seasonal return-to-New-York story is now live across autumn guest messages.",
     changes: ["Added Broadway Week and rooftop reopening", "Shortened mobile text to one clear action", "Used warmer local language for OTA guests"],
     expectedEffect: "Likely to lift opens because event-led subjects outperformed generic subjects last September.",
@@ -38,7 +38,7 @@ export const RELEASES: Release[] = [
   {
     id: "summer-2026", name: "Summer 2026", year: 2026, from: 5, to: 7,
     source: "Manual", created: "May 28", publishedAt: "May 28, 2026 · 10:32 AM", status: "Replaced",
-    properties: 31, editedCampaigns: 4, campaignCount: 11,
+    properties: 31, editedCampaigns: 4, campaignCount: 16,
     summary: "Summer messages highlighted family stays, late checkout, and the rooftop season.",
     changes: ["Moved family benefits into the opening line", "Added rooftop imagery to email", "Introduced late-checkout reminders"],
     expectedEffect: "Likely improved clicks because the offer appeared earlier and used a single destination link.",
@@ -47,7 +47,7 @@ export const RELEASES: Release[] = [
   {
     id: "winter-spring-2026", name: "January–May 2026", year: 2026, from: 0, to: 4,
     source: "AI generated", created: "Jan 2", publishedAt: "Jan 2, 2026 · 9:05 AM", status: "Replaced",
-    properties: 31, campaignCount: 11,
+    properties: 31, campaignCount: 16,
     summary: "The first seasonal publication introduced local planning tips and clearer arrival messages.",
     changes: ["Added indoor winter recommendations", "Clarified arrival-day timing", "Simplified long-stay return messages"],
     expectedEffect: "Likely reduced guest questions because arrival details were moved into the first message.",
@@ -56,7 +56,7 @@ export const RELEASES: Release[] = [
   {
     id: "holiday-2025", name: "Holiday 2025", year: 2025, from: 10, to: 11,
     source: "Manual", created: "Nov 4", publishedAt: "Nov 4, 2025 · 11:40 AM", status: "Replaced",
-    properties: 30, editedCampaigns: 3, campaignCount: 11,
+    properties: 30, editedCampaigns: 3, campaignCount: 16,
     summary: "Holiday messaging centered gifting, city lights, and festive weekend stays.",
     changes: ["Added holiday market recommendations", "Introduced gift-stay email layout", "Adjusted send timing for weekend arrivals"],
     expectedEffect: "Likely increased return visits because the publication gave guests a timely reason to book again.",
@@ -65,7 +65,7 @@ export const RELEASES: Release[] = [
   {
     id: "sep-nov-2025", name: "September–November 2025", year: 2025, from: 8, to: 10,
     source: "AI generated", created: "Aug 29", publishedAt: "Aug 29, 2025 · 3:18 PM", status: "Replaced",
-    properties: 28, campaignCount: 11,
+    properties: 28, campaignCount: 16,
     summary: "Last year's autumn publication focused on city weekends and early holiday planning.",
     changes: ["Added weekend itinerary ideas", "Featured direct-booking flexibility", "Used neighborhood recommendations"],
     expectedEffect: "Performance was strongest when a local event was named directly in the subject.",
@@ -74,7 +74,7 @@ export const RELEASES: Release[] = [
   {
     id: "default", name: "Year-round foundation", year: 2025, from: 0, to: 11,
     source: "Default", created: "Jan 2", publishedAt: "Jan 2, 2025 · 8:30 AM", status: "Live",
-    properties: 31, campaignCount: 11,
+    properties: 31, campaignCount: 16,
     summary: "The fallback publication keeps essential booking and stay messages available all year.",
     changes: ["Standardized guest names and property details", "Added consistent direct-booking links", "Established the default campaign timing"],
     expectedEffect: "Provides a stable baseline whenever no seasonal publication is active.",
@@ -83,6 +83,17 @@ export const RELEASES: Release[] = [
 ];
 
 export const ACTIVE_RELEASE_ID = "sep-nov-2026";
+
+let selectedReleaseId = ACTIVE_RELEASE_ID;
+const selectionSubs = new Set<() => void>();
+export function useSelectedRelease() {
+  const selected = useSyncExternalStore((notify) => (selectionSubs.add(notify), () => selectionSubs.delete(notify)), () => selectedReleaseId, () => ACTIVE_RELEASE_ID);
+  const select = (id: string) => {
+    selectedReleaseId = id;
+    selectionSubs.forEach((notify) => notify());
+  };
+  return [selected, select] as const;
+}
 
 export type ReleaseMetric = { label: string; value: string; delta: string };
 export type ReleaseMonthResult = { month: number; clicks: number; engagement: number; calls: number };

@@ -5,7 +5,7 @@ import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { Button } from "@/components/ui/button";
 import { MONTHS } from "@/lib/contentLibrary";
 import { useMarketing } from "@/lib/marketing";
-import { ACTIVE_RELEASE_ID, CONFIDENCE, RELEASE_RESULTS, RELEASES, TOTAL_PROPERTIES, versionsFor, type Confidence, type Release } from "@/lib/releases";
+import { ACTIVE_RELEASE_ID, CONFIDENCE, RELEASE_RESULTS, RELEASES, TOTAL_PROPERTIES, useSelectedRelease, versionsFor, type Confidence, type Release } from "@/lib/releases";
 
 type DetailView = "overview" | "months" | "campaigns";
 
@@ -166,7 +166,7 @@ function VersionDetail({ campaignId, month, campaignName, onBack }: { campaignId
 }
 
 function PublicationWorkspace({ page }: { page: "releases" | "results" }) {
-  const [selectedId, setSelectedId] = useState(ACTIVE_RELEASE_ID);
+  const [selectedId, setSelectedId] = useSelectedRelease();
   const [view, setView] = useState<DetailView>("overview");
   const [campaignDrill, setCampaignDrill] = useState<{ id: string; month: number } | null>(null);
   const [votes, setVotes] = useState<Record<string, "up" | "down">>({});

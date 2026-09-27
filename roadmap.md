@@ -194,8 +194,8 @@
 
 ## Publication-led Releases and Results redesign
 
-- [ ] Add year-grouped publication history with an unmistakable selected and live publication
-- [ ] Rebuild Releases around publication details, AI change summary, months, campaigns, and versions
-- [ ] Rebuild Results around publication-specific KPIs, comparisons, insights, months, and campaigns
-- [ ] Apply the selected editorial-ledger layout with Directful colors and Roboto
-- [ ] Verify both pages and their drill-downs at desktop and mobile widths
+- [x] Add year-grouped publication history with an unmistakable selected and live publication
+- [x] Rebuild Releases around publication details, AI change summary, months, campaigns, and versions
+- [x] Rebuild Results around publication-specific KPIs, comparisons, insights, months, and campaigns
+- [x] Apply the selected editorial-ledger layout with Directful colors and Roboto
+- [x] Verify both pages and their drill-downs at desktop and mobile widths
