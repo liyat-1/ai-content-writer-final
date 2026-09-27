@@ -181,3 +181,13 @@
 - [x] Keep draft Save changes separate from the top-level Publish all action
 - [x] Verify calendar, AI planning, review, version switching, and publish flows at desktop and mobile widths
 - [x] Keep review guest-segment selection synchronized across Preview, Edit with AI, Compare, and Content insight
+
+## Content release workspace refinement
+
+- [x] Merge the calendar, version controls, personalization prompt, and campaigns into one continuous workspace
+- [x] Open Edit content with AI directly in-page and remove the default-content choice popup
+- [x] Expand the AI plan with events, holidays, creative direction, media, templates, and performance learning
+- [x] Restore a richer generation state and allow publishing the complete timeframe without mandatory review
+- [x] Give generated cards channel/audience previews and a single Review action
+- [x] Embed AI editing inside the review's dynamic panel instead of opening a second popup
+- [x] Verify the complete release flow at desktop and narrow widths
