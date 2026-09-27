@@ -11,3 +11,4 @@
 
 - Content Library cards own their channel and audience preview state so each card only exposes channels that campaign actually sends.
 - Directful AI editing uses a centered modal workspace over the existing editor, preserving campaign context instead of opening a side drawer.
+- The package-level AI content planner renders inline above the calendar; campaign-level AI editing remains inside the review workspace's dynamic panel so context never disappears.
