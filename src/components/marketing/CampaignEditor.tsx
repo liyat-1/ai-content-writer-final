@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, History, HelpCircle, RotateCcw, ShieldCheck, X } from "lucide-react";
+import { Check, Eye, History, HelpCircle, Maximize2, RotateCcw, ShieldCheck, X } from "lucide-react";
 import { TextEditor } from "./TextEditor";
 import { EmailEditor, EmailPreview } from "./EmailEditor";
 import { PromotionSelector } from "./PromotionSelector";
@@ -86,7 +86,7 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
   const [panel, setPanel] = useState<Panel>(null);
   const [confirm, setConfirm] = useState<"leave" | "save" | "revert" | null>(null);
   const [promotionPicker, setPromotionPicker] = useState(false);
-  const [aiOpen, setAiOpen] = useState(false);
+  const [rightView, setRightView] = useState<"preview" | "ai" | "minimized">("preview");
   const dirty = useMemo(() => draft ? JSON.stringify(draft) !== baseline : false, [draft, baseline]);
 
   useEffect(() => {
@@ -226,7 +226,7 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
                     <div className="border-t border-border px-4 py-4">
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="ml-auto flex flex-wrap items-center gap-1.5">
-                          <Button variant="brand" size="sm" className="px-2.5" onClick={() => setAiOpen(true)}>
+                           <Button variant="brand" size="sm" className="px-2.5" onClick={() => setRightView("ai")}>
                             <Sparkle size={13} />Edit with AI
                           </Button>
                           <SectionAction icon={History} label="History" active={panel === "history"} onClick={() => setPanel((p) => (p === "history" ? null : "history"))} />
@@ -317,24 +317,24 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
           </div>
           </div>
 
-          {/* Persistent live preview for the active audience */}
+          {/* The selected audience and channel stay fixed while this area switches context. */}
           <div className="min-w-0 lg:sticky lg:top-4 lg:self-start">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Preview · {AUDIENCE_LABEL[audience]} · {activeChannel === "text" ? "Text" : "Email"}
-            </p>
-            {activeChannel === "text" ? (
-              <div className="flex max-w-full justify-center overflow-x-auto pb-2 lg:justify-start">
-                <SmsPreview
-                  message={variant.text.message}
-                  imageUrl={previewMedia?.url ?? null}
-                  sender="Holiday Inn"
-                  scale={0.62}
-                  promotion={activePromotion}
-                />
-              </div>
-            ) : (
-              <EmailPreview value={variant.email} promotion={activePromotion} />
-            )}
+            <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+              <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{rightView === "ai" ? "AI editor" : "Preview"} · {AUDIENCE_LABEL[audience]} · {activeChannel === "text" ? "Text" : "Email"}</p>
+              {rightView !== "preview" && <Button variant="ghost" size="sm" onClick={() => setRightView("preview")}><Eye size={13} />Preview</Button>}
+            </div>
+            {rightView === "minimized" && <button type="button" onClick={() => setRightView("ai")} className="mb-3 grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-md border border-brand/25 bg-brand-soft/55 p-3 text-left shadow-card"><span className="grid size-8 place-items-center rounded-md bg-brand text-brand-foreground"><Sparkle size={14} /></span><span className="min-w-0"><span className="block text-[12px] font-semibold text-card-foreground">Directful AI is minimized</span><span className="block truncate text-[10.5px] text-muted-foreground">{draft.name} · {AUDIENCE_LABEL[audience]} · {activeChannel === "email" ? "Email" : "Text"}</span></span><Maximize2 size={15} className="text-brand" /></button>}
+            {rightView === "ai" ? <AiEditPanel
+              embedded
+              title={`${draft.name} · ${AUDIENCE_LABEL[audience]}`}
+              copy={activeChannel === "email" ? { kind: "email", email: { subject: variant.email.subject, preheader: variant.email.preheader, heading: variant.email.heading, body: variant.email.body, ctaLabel: variant.email.ctaLabel } } : { kind: "text", text: { message: variant.text.message } }}
+              onApply={(next) => setVariant(next.kind === "email" ? { ...variant, email: { ...variant.email, subject: next.email.subject, preheader: next.email.preheader, heading: next.email.heading, body: next.email.body, ctaLabel: next.email.ctaLabel } } : { ...variant, text: { ...variant.text, message: next.text.message } }, activeChannel)}
+              onClose={() => setRightView("preview")}
+              onMinimize={() => setRightView("minimized")}
+              onEditMyself={() => setRightView("preview")}
+            /> : activeChannel === "text" ? (
+              <div className="flex max-w-full justify-center overflow-x-auto pb-2 lg:justify-start"><SmsPreview message={variant.text.message} imageUrl={previewMedia?.url ?? null} sender="Holiday Inn" scale={0.62} promotion={activePromotion} /></div>
+            ) : <EmailPreview value={variant.email} promotion={activePromotion} />}
           </div>
         </div>
       </div>
@@ -348,27 +348,6 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
         onClose={() => setPromotionPicker(false)}
         onSelect={setPromotion}
       />
-
-      {aiOpen && (
-        <AiEditPanel
-          className="z-[75]"
-          title={`${draft.name} · ${AUDIENCE_LABEL[audience]}`}
-          copy={
-            activeChannel === "email"
-              ? { kind: "email", email: { subject: variant.email.subject, preheader: variant.email.preheader, heading: variant.email.heading, body: variant.email.body, ctaLabel: variant.email.ctaLabel } }
-              : { kind: "text", text: { message: variant.text.message } }
-          }
-          onApply={(next) => {
-            setVariant(
-              next.kind === "email"
-                ? { ...variant, email: { ...variant.email, subject: next.email.subject, preheader: next.email.preheader, heading: next.email.heading, body: next.email.body, ctaLabel: next.email.ctaLabel } }
-                : { ...variant, text: { ...variant.text, message: next.text.message } },
-              activeChannel,
-            );
-          }}
-          onClose={() => setAiOpen(false)}
-        />
-      )}
 
       <AlertDialog open={confirm !== null} onOpenChange={(value) => !value && setConfirm(null)}>
         <AlertDialogContent className="border-border bg-card shadow-float">

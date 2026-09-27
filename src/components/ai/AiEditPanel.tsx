@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Check, ChevronDown, GitCompare, ImagePlus, RefreshCw, SlidersHorizontal, Pencil, X } from "lucide-react";
+import { ArrowUp, Check, ChevronDown, GitCompare, ImagePlus, Minimize2, RefreshCw, SlidersHorizontal, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sparkle } from "./Sparkle";
 import {
@@ -47,6 +47,7 @@ export function AiEditPanel({
   onEditMyself,
   className = "z-[70]",
   embedded = false,
+  onMinimize,
 }: {
   title: string;
   copy: Copy;
@@ -55,6 +56,7 @@ export function AiEditPanel({
   onEditMyself?: () => void;
   className?: string;
   embedded?: boolean;
+  onMinimize?: () => void;
 }) {
   const [msgs, setMsgs] = useState<Msg[]>([
     { role: "ai", text: `I'm working on the current ${copy.kind === "email" ? "email" : "text message"} for ${title} — including any edits you've made. What would you like to change?` },
@@ -124,21 +126,24 @@ export function AiEditPanel({
     <div className={embedded ? "h-full min-h-[520px]" : `fixed inset-0 grid place-items-center bg-foreground/25 p-3 backdrop-blur-[3px] sm:p-6 ${className}`} onMouseDown={(event) => !embedded && event.target === event.currentTarget && onClose()}>
     <aside role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : "true"} aria-label="Directful AI" className={`ai-rise relative flex w-full flex-col overflow-hidden border border-brand/25 bg-card/95 ${embedded ? "h-full min-h-[520px] rounded-md shadow-none" : "max-h-[min(82vh,46rem)] max-w-[44rem] rounded-xl shadow-float backdrop-blur-xl"}`}>
       <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand" />
-      <header className="flex items-start justify-between gap-3 border-b border-border px-4 py-3.5 sm:px-5">
+      <header className="flex items-start justify-between gap-3 border-b border-border bg-card px-4 py-3.5 sm:px-5">
         <div className="min-w-0">
           <p className="flex items-center gap-1.5 text-[14px] font-semibold text-card-foreground"><Sparkle className="text-brand" size={15} />Directful AI</p>
           <p className="truncate text-[11.5px] text-muted-foreground">{title} · {copy.kind === "email" ? "Email" : "Text"}</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close Directful AI"><X size={16} /></Button>
+        <div className="flex items-center gap-1">
+          {onMinimize && <Button variant="ghost" size="icon" onClick={onMinimize} aria-label="Minimize Directful AI"><Minimize2 size={16} /></Button>}
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close Directful AI"><X size={16} /></Button>
+        </div>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5">
+      <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-canvas/45 px-4 py-5 sm:px-5">
         {msgs.map((m, idx) =>
           m.role === "user" ? (
             <div key={idx} className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-[12.5px] text-primary-foreground">{m.text}</div>
           ) : (
             <div key={idx} className="space-y-2">
-              <p className="flex gap-2 text-[12.5px] leading-relaxed text-card-foreground"><Sparkle size={12} className="mt-1 shrink-0 text-brand" />{m.text}</p>
+              <p className="flex gap-2 text-[12.5px] leading-relaxed text-card-foreground"><span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-md bg-brand-soft text-brand"><Sparkle size={12} /></span><span className="pt-1">{m.text}</span></p>
               {m.proposal && (
                 <div className={`rounded-md border ${m.proposal.state === "open" ? "border-brand/40" : "border-border opacity-70"}`}>
                   <div className="flex items-center justify-between border-b border-border px-3 py-2">
@@ -186,7 +191,7 @@ export function AiEditPanel({
         <div ref={endRef} />
       </div>
 
-      <div className="border-t border-border bg-card/90 px-4 py-3 sm:px-5">
+      <div className="border-t border-border bg-card px-4 py-3 sm:px-5">
         <button onClick={() => setShowPersonalize((v) => !v)} className="mb-2 flex items-center gap-1.5 text-[12px] font-medium text-card-foreground">
           <SlidersHorizontal size={13} />Personalize<ChevronDown size={13} className={`transition-transform ${showPersonalize ? "rotate-180" : ""}`} />
         </button>
