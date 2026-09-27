@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import { CalendarDays, Check, ChevronLeft, ChevronRight, Clock3, FlaskConical, Mail, MessageSquare, Pencil, Sparkles } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock3, FlaskConical, Mail, MessageSquare, Pencil, Sparkles } from "lucide-react";
 import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { CampaignEditor } from "@/components/marketing/CampaignEditor";
 import { TestCampaignDialog } from "@/components/marketing/MarketingDialogs";
 import { Button } from "@/components/ui/button";
-import { CURRENT_USER, STRATEGY_LABEL, lastEdit, strategyHasEmail, useMarketing, type MarketingCampaign } from "@/lib/marketing";
+import { STRATEGY_LABEL, lastEdit, strategyHasEmail, useMarketing, type MarketingCampaign } from "@/lib/marketing";
 import { EDITOR_ID, MONTH_PACKAGES, packageSnippet, publishDraftRelease, useLibrary, type Channel, type LibraryCampaign, type MonthPackage, type Segment } from "@/lib/contentLibrary";
 import { Sparkle } from "@/components/ai/Sparkle";
 import { Link } from "@tanstack/react-router";
@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { PINNED_PROPERTIES, RISK, TOTAL_PROPERTIES, markReviewed, resetReviewed, revertMonth, riskFor, setDismissed, topRelease, useReleaseUi, versionsFor, type Release } from "@/lib/releases";
+import { PINNED_PROPERTIES, RISK, TOTAL_PROPERTIES, resetReviewed, revertMonth, riskFor, setDismissed, topRelease, useReleaseUi, versionsFor, type Release } from "@/lib/releases";
 import { AiCreateStudio } from "./AiCreateStudio";
 import { ReviewWorkspace } from "./ReviewWorkspace";
 
@@ -48,6 +48,7 @@ function PublishedCard({ campaign, libraryCampaign, pack, draft, month, monthNam
 
 export function CreateWorkspace() {
   const [offset, setOffset] = useState(0);
+  const [calendarSpan, setCalendarSpan] = useState<1 | 3>(3);
   const [studio, setStudio] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [testing, setTesting] = useState<string | null>(null);
@@ -70,6 +71,14 @@ export function CreateWorkspace() {
   const reviewId = (id: string) => libraryCampaigns.find((campaign) => EDITOR_ID[campaign.id] === id && (campaign.status === "Needs review" || campaign.status === "Approved"))?.id;
   const top = topRelease(month, Boolean(ui.reverted[month]));
   const personalize = selectedPack.source === "default" || (month === 8 && selectedPack.id === "sep-live");
+  const visibleMonths = Array.from({ length: calendarSpan }, (_, index) => {
+    const absolute = START_MONTH + offset + index;
+    const itemMonth = absolute % 12;
+    const itemYear = 2026 + Math.floor(absolute / 12);
+    const itemPackages = MONTH_PACKAGES.filter((pack) => pack.month === itemMonth && pack.year === itemYear);
+    const itemPack = itemPackages.find((pack) => pack.id === selectedPackages[`${itemMonth}-${itemYear}`]) ?? itemPackages[0];
+    return { month: itemMonth, year: itemYear, name: new Intl.DateTimeFormat("en", { month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(itemYear, itemMonth, 1))), pack: itemPack };
+  });
 
   const publish = (range: string) => { const count = publishDraftRelease(range); setStudio(false); setNotice(`${count} campaigns published as the ${range} release.`); };
 
@@ -78,7 +87,9 @@ export function CreateWorkspace() {
     {notice && <div role="status" className="mb-4 rounded-md bg-brand-soft p-3 text-[12px] font-medium text-brand">{notice}</div>}
     {studio && <AiCreateStudio onClose={() => setStudio(false)} onReview={() => { setStudio(false); setNotice(""); }} onPublish={publish} />}
     {!studio && <section className="overflow-hidden rounded-lg border border-border bg-card shadow-card" aria-label="Monthly published content">
-      <div className="grid items-center gap-4 border-b border-border p-4 sm:grid-cols-[1fr_auto_1fr] sm:p-5"><div className="hidden items-center gap-2 text-[12px] text-muted-foreground sm:flex"><CalendarDays size={16} className="text-brand" />Content calendar</div><div className="flex items-center justify-center gap-3"><Button variant="ghost" size="icon" aria-label="Previous month" disabled={offset === 0} onClick={() => setOffset((value) => value - 1)}><ChevronLeft /></Button><div className="min-w-40 text-center"><p className="font-display text-[24px] font-semibold text-card-foreground">{monthName}</p><p className="text-[11px] text-muted-foreground">{year}</p></div><Button variant="ghost" size="icon" aria-label="Next month" onClick={() => setOffset((value) => value + 1)}><ChevronRight /></Button></div><div className="flex justify-center sm:justify-end"><span className={`rounded-sm px-2 py-1 text-[11px] font-semibold ${selectedPack.status === "Live now" ? "bg-brand-soft text-brand" : "bg-muted text-muted-foreground"}`}>{selectedPack.status}</span></div></div>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border p-4 sm:flex sm:justify-between sm:p-5"><div className="flex min-w-0 items-center gap-2"><CalendarDays size={16} className="shrink-0 text-brand" /><div className="min-w-0"><p className="truncate text-[13px] font-semibold text-card-foreground">Content calendar</p><p className="text-[10.5px] text-muted-foreground">Live and scheduled publications</p></div></div><div className="flex shrink-0 items-center gap-2"><div className="flex rounded-md bg-muted p-1"><Button size="sm" variant={calendarSpan === 1 ? "secondary" : "ghost"} onClick={() => setCalendarSpan(1)}>Month</Button><Button size="sm" variant={calendarSpan === 3 ? "secondary" : "ghost"} onClick={() => setCalendarSpan(3)}>3 months</Button></div><Button variant="ghost" size="icon" aria-label="Previous period" disabled={offset === 0} onClick={() => setOffset((value) => Math.max(0, value - calendarSpan))}><ChevronLeft /></Button><Button variant="ghost" size="icon" aria-label="Next period" onClick={() => setOffset((value) => value + calendarSpan)}><ChevronRight /></Button></div></div>
+      <div className={`grid gap-px border-b border-border bg-border ${calendarSpan === 3 ? "lg:grid-cols-3" : "grid-cols-1"}`}>{visibleMonths.map((item, index) => <button type="button" key={`${item.month}-${item.year}`} onClick={() => setOffset((item.year - 2026) * 12 + item.month - START_MONTH)} className={`bg-card p-4 text-left transition-colors hover:bg-muted/35 ${index === 0 ? "ring-2 ring-inset ring-brand" : ""}`}><div className="flex items-start justify-between gap-3"><div><p className="text-[18px] font-semibold text-card-foreground">{item.name} {item.year}</p><p className="mt-1 text-[11px] text-muted-foreground">{item.pack?.label ?? "Year-round content"}</p></div><span className={`rounded-sm px-2 py-1 text-[10px] font-semibold ${item.pack?.status === "Live now" ? "bg-brand text-brand-foreground" : item.pack?.status === "Scheduled" ? "bg-brand-soft text-brand" : "bg-muted text-muted-foreground"}`}>{item.pack?.status ?? "Default"}</span></div><div className="mt-4 grid grid-cols-2 gap-2"><div className="rounded-md bg-muted/55 p-2.5"><p className="text-[9.5px] uppercase text-muted-foreground">Campaigns</p><p className="mt-1 text-[15px] font-semibold text-card-foreground">{mk.campaigns.length}</p></div><div className="rounded-md bg-muted/55 p-2.5"><p className="text-[9.5px] uppercase text-muted-foreground">Version</p><p className="mt-1 text-[15px] font-semibold text-card-foreground">{item.pack?.version ?? "v1"}</p></div></div><div className="mt-3 space-y-1.5">{mk.campaigns.slice(0, 3).map((campaign) => <div key={campaign.id} className="flex items-center justify-between gap-2 text-[10.5px]"><span className="truncate text-card-foreground">{campaign.name}</span><span className="shrink-0 text-muted-foreground">{strategyHasEmail(campaign.strategy) ? "Email + Text" : "Text"}</span></div>)}</div></button>)}</div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-5"><div><p className="text-[16px] font-semibold text-card-foreground">{monthName} {year}</p><p className="text-[10.5px] text-muted-foreground">Campaign content for the selected month</p></div><span className={`rounded-sm px-2 py-1 text-[11px] font-semibold ${selectedPack.status === "Live now" ? "bg-brand-soft text-brand" : "bg-muted text-muted-foreground"}`}>{selectedPack.status}</span></div>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-5"><Popover><PopoverTrigger asChild><button className="text-[12.5px] font-medium text-card-foreground underline decoration-dotted underline-offset-4">{TOTAL_PROPERTIES - PINNED_PROPERTIES.length} of {TOTAL_PROPERTIES} properties on live content</button></PopoverTrigger><PopoverContent className="w-72"><p className="text-[12px] font-semibold text-card-foreground">On other versions</p><ul className="mt-2 space-y-1.5">{PINNED_PROPERTIES.map((p) => <li key={p.name} className="text-[12px]"><span className="block font-medium text-card-foreground">{p.name}</span><span className="text-muted-foreground">{p.on} · {p.why}</span></li>)}</ul><Link to="/content/releases" className="mt-3 inline-block text-[12px] font-semibold text-brand">See in Releases →</Link></PopoverContent></Popover>{top.id !== "default" && !hasDrafts && <Button variant="ghost" size="sm" onClick={() => setConfirmRevert(true)}><RotateCcw size={13} />Revert {monthName}</Button>}</div>
       <div className="space-y-9 p-4 sm:p-6">
         {!hasDrafts && top.id === "default" && !ui.dismissed[month] && <div className="relative overflow-hidden rounded-lg border border-brand/20 ai-surface px-5 py-6 shadow-card sm:px-7"><div className="relative flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center"><div className="flex gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-md bg-brand text-brand-foreground shadow-card"><Sparkle size={20} /></span><div><p className="text-[10.5px] font-semibold uppercase text-brand">{monthName} {year}</p><h2 className="mt-1 font-display text-[21px] font-semibold text-card-foreground">Personalize {monthName} for the season</h2><p className="mt-1 max-w-2xl text-[12.5px] leading-relaxed text-muted-foreground">These {monthName} campaigns are the same as the rest of the year. Personalize the campaigns below and schedule them for the season.</p></div></div><div className="flex gap-2"><Button variant="ghost" onClick={() => setDismissed(month, true)}>Keep current content</Button><Button variant="brand" onClick={() => setStudio(true)}><Sparkle size={14} />Personalize with AI</Button></div></div></div>}
