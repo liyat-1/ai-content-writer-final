@@ -244,5 +244,5 @@ export type Insight = { id: string; text: string; evidence: string };
 export const INSIGHTS: Insight[] = [
   { id: "i1", text: "Subjects that name a local event likely lift opens — guests respond to a clear reason to return now.", evidence: "Subjects with the event name: 24% open vs 18%." },
   { id: "i2", text: "The Sept–Nov release is possibly lifting clicks for OTA guests.", evidence: "OTA clicks 3.1% vs 2.7% on v1 (3 days)." },
-  { id: "i3", text: "Shorter texts with one link likely perform better on mobile.", evidence: "Texts under 140 characters: 3.4% click vs 2.6%.", conf: "emerging" },
+  { id: "i3", text: "Shorter texts with one link likely perform better on mobile.", evidence: "Texts under 140 characters: 3.4% click vs 2.6%." },
 ];
