@@ -208,8 +208,10 @@ export const revertMonth = (m: number) => { ui = { ...ui, reverted: { ...ui.reve
 /** Which release is on top for a month (layering rule). */
 export function topRelease(month: number, reverted = false): Release {
   const layers = RELEASES.filter((r) => r.status !== "Removed" && month >= r.from && month <= r.to);
-  if (reverted && layers.length > 1) return layers[layers.length - 2];
-  return layers[layers.length - 1];
+  const foundation = layers.find((r) => r.id === "default");
+  const seasonal = layers.find((r) => r.year === 2026 && r.id !== "default" && r.status === "Live");
+  if (reverted || !seasonal) return foundation ?? layers[0];
+  return seasonal;
 }
 
 export const RESULT_KPIS = [
