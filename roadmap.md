@@ -161,7 +161,8 @@
 
 ## Publishing-first content management
 
-- [ ] Make the current, year-round published package the first view, with month navigation and contextual future-month personalization
-- [ ] Show campaign cards across invites, transactional and in-property, with only Edit content and Test as primary actions
-- [ ] Make AI creation a package-level monthly planning flow with flexible dates, attachments and review before publication
-- [ ] Align Published and Performance views with the monthly package mental model and clearly label sample figures
+- [x] Make the current, year-round published package the first view, with month navigation and contextual future-month personalization
+- [x] Show campaign cards across invites, transactional and in-property, with only Edit content and Test as primary actions
+- [x] Make AI creation a package-level monthly planning flow with flexible dates, attachments and review before publication
+- [x] Align Published and Performance views with the monthly package mental model and clearly label sample figures
+- [x] Verified all Content Library pages (Create, Published, Performance, History, A/B Tests, Settings) at desktop and mobile widths — no console errors
