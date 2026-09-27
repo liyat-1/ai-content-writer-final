@@ -14,3 +14,4 @@
 - The package-level AI content planner renders inline above the calendar; campaign-level AI editing remains inside the review workspace's dynamic panel so context never disappears.
 - Content release data lives in src/lib/releases.ts as one mock source for Content, Releases and Results.
 - Releases and Results use one selected publication and its matching prior-period comparison; avoid unrelated analytics hierarchies.
+- The year-round foundation remains live underneath seasonal publications; uncovered future months automatically use it until AI content is explicitly scheduled.

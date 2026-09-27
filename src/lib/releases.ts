@@ -27,13 +27,13 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   {
-    id: "holiday-2026", name: "Holiday season 2026", year: 2026, from: 10, to: 11,
-    source: "AI generated", created: "Sep 27", publishedAt: "Sep 27, 2026 · 4:20 PM", status: "Scheduled",
-    properties: 27, campaignCount: 10, replaces: "September–November 2026",
-    summary: "A scheduled holiday publication for November and December with city-light, gifting, and winter-weekend stories.",
-    changes: ["Added holiday windows and Rockefeller Center", "Planned warmer winter imagery", "Moved November event messages earlier"],
-    expectedEffect: "Likely to protect November bookings by sending time-sensitive event messages earlier than last year.",
-    comparison: "Holiday 2025",
+    id: "default-2027", name: "Year-round foundation 2027", year: 2027, from: 0, to: 11,
+    source: "Default", created: "Sep 27", publishedAt: "Scheduled Sep 27, 2026", status: "Scheduled",
+    properties: 31, campaignCount: 16,
+    summary: "The approved year-round content will continue through 2027 wherever no seasonal publication is scheduled.",
+    changes: ["Carries forward the approved guest journey", "Keeps property details and booking links current", "Leaves room for future seasonal publications"],
+    expectedEffect: "Every month remains covered while seasonal content can be added later without changing the foundation.",
+    comparison: "Year-round foundation 2026",
   },
   {
     id: "sep-nov-2026", name: "September–November 2026", year: 2026, from: 8, to: 10,
@@ -81,13 +81,13 @@ export const RELEASES: Release[] = [
     comparison: "September–November 2024",
   },
   {
-    id: "default", name: "Year-round foundation", year: 2025, from: 0, to: 11,
-    source: "Default", created: "Jan 2", publishedAt: "Jan 2, 2025 · 8:30 AM", status: "Live",
+    id: "default", name: "Year-round foundation 2026", year: 2026, from: 0, to: 11,
+    source: "Default", created: "Jan 2", publishedAt: "Jan 2, 2026 · 8:30 AM", status: "Live",
     properties: 31, campaignCount: 16,
-    summary: "The fallback publication keeps essential booking and stay messages available all year.",
+    summary: "This foundation stays live all year and automatically serves every month not covered by a seasonal publication.",
     changes: ["Standardized guest names and property details", "Added consistent direct-booking links", "Established the default campaign timing"],
     expectedEffect: "Provides a stable baseline whenever no seasonal publication is active.",
-    comparison: "Year-round 2024",
+    comparison: "Year-round foundation 2025",
   },
 ];
 
@@ -96,7 +96,7 @@ export const ACTIVE_RELEASE_ID = "sep-nov-2026";
 /** Hotels using a publication per campaign (0 = none, TOTAL_PROPERTIES = all). */
 const adoption = (all: number, overrides: Record<string, number> = {}) => (id: string) => overrides[id] ?? all;
 export const RELEASE_CAMPAIGN_PROPERTIES: Record<string, (campaignId: string) => number> = {
-  "holiday-2026": adoption(27, { "lost-12": 0, "lost-15": 0, "lost-15-plus": 0, "no-show": 12 }),
+  "default-2027": adoption(31),
   "sep-nov-2026": adoption(29, { "just-booked": 29, "before-arrival": 29, "lost-15-plus": 4, cancelled: 0, "no-show": 0 }),
   "summer-2026": adoption(31),
   "winter-spring-2026": adoption(31, { "lost-15-plus": 9 }),
