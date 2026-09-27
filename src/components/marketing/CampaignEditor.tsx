@@ -175,7 +175,7 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
-        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className={`mx-auto grid max-w-6xl gap-6 ${rightView === "minimized" ? "lg:grid-cols-[minmax(0,1fr)_68px]" : "lg:grid-cols-[minmax(0,1fr)_380px]"}`}>
           <div className="min-w-0">
             {/* Channel tabs — Text and Email each keep their own Direct / OTA sections */}
             <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -319,11 +319,13 @@ export function CampaignEditor({ id, onClose }: { id: string; onClose: () => voi
 
           {/* The selected audience and channel stay fixed while this area switches context. */}
           <div className="min-w-0 lg:sticky lg:top-4 lg:self-start">
+            {rightView !== "minimized" && <>
             <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{rightView === "ai" ? "AI editor" : "Preview"} · {AUDIENCE_LABEL[audience]} · {activeChannel === "text" ? "Text" : "Email"}</p>
               {rightView !== "preview" && <Button variant="ghost" size="sm" onClick={() => setRightView("preview")}><Eye size={13} />Preview</Button>}
             </div>
-            {rightView === "minimized" && <button type="button" onClick={() => setRightView("ai")} className="mb-3 grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-md border border-brand/25 bg-brand-soft/55 p-3 text-left shadow-card"><span className="grid size-8 place-items-center rounded-md bg-brand text-brand-foreground"><Sparkle size={14} /></span><span className="min-w-0"><span className="block text-[12px] font-semibold text-card-foreground">Directful AI is minimized</span><span className="block truncate text-[10.5px] text-muted-foreground">{draft.name} · {AUDIENCE_LABEL[audience]} · {activeChannel === "email" ? "Email" : "Text"}</span></span><Maximize2 size={15} className="text-brand" /></button>}
+            </>}
+            {rightView === "minimized" && <Button type="button" variant="ghost" onClick={() => setRightView("ai")} className="group flex h-[520px] w-full flex-col justify-between border border-border bg-card px-2 py-4 shadow-card hover:border-brand/30 hover:bg-card" aria-label="Expand Directful AI"><span className="grid size-9 place-items-center rounded-md bg-brand text-brand-foreground shadow-card"><Sparkle size={15} /></span><span className="[writing-mode:vertical-rl] rotate-180 text-[11px] font-semibold text-card-foreground">Directful AI · {AUDIENCE_LABEL[audience]}</span><Maximize2 size={15} className="text-brand transition-transform group-hover:scale-110" /></Button>}
             {rightView === "ai" ? <AiEditPanel
               embedded
               title={`${draft.name} · ${AUDIENCE_LABEL[audience]}`}
