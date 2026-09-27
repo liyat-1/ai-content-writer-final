@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Check, ChevronDown, ChevronRight, Clock3, Mail, MessageSquare, Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
+import { ArrowDownRight, ArrowRight, ArrowUpRight, Check, ChevronDown, ChevronRight, Clock3, Mail, MessageSquare, Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
 import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { Button } from "@/components/ui/button";
 import { MONTHS } from "@/lib/contentLibrary";
@@ -77,7 +77,7 @@ function PublicationHero({ release, page }: { release: Release; page: "release" 
             <p className="mt-2 max-w-2xl text-[13px] leading-5 text-muted-foreground">{release.summary}</p>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <span className={`rounded-sm px-2 py-1 text-[10.5px] font-semibold ${active ? "bg-brand text-brand-foreground" : "bg-muted text-muted-foreground"}`}>{active ? "Live now" : "Archived"}</span>
+            <span className={`rounded-sm px-2 py-1 text-[10.5px] font-semibold ${active ? "bg-brand text-brand-foreground" : release.status === "Scheduled" ? "bg-brand-soft text-brand" : "bg-muted text-muted-foreground"}`}>{active ? "Live now" : release.status}</span>
             {page === "results" && result && <span className="text-[11px] text-muted-foreground">Measured through {result.measuredThrough}</span>}
           </div>
         </div>
@@ -155,7 +155,6 @@ function PublicationWorkspace({ page }: { page: "releases" | "results" }) {
   const release = RELEASES.find((item) => item.id === selectedId) ?? RELEASES[0];
   const result = RELEASE_RESULTS[release.id] ?? RELEASE_RESULTS.default;
   const campaign = campaignDrill ? campaigns.find((item) => item.id === campaignDrill.id) : undefined;
-  const maxClicks = Math.max(...result.months.map((item) => item.clicks), 1);
   const selectRelease = (id: string) => { setSelectedId(id); setView("overview"); setCampaignDrill(null); };
   const openCampaign = (id: string, month: number) => setCampaignDrill({ id, month });
 
