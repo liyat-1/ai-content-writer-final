@@ -118,7 +118,7 @@ export function CreateWorkspace() {
         </section>
       </main>
       {approved.length > 0 && <div className="sticky bottom-0 z-20 border-t border-border bg-card/95 px-4 py-3 backdrop-blur-md"><div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3"><Check size={16} className="text-brand" /><p className="flex-1 text-[12px] text-card-foreground">{approved.length} reviewed AI campaign{approved.length !== 1 ? "s" : ""} ready to publish</p><Button variant="brand" onClick={() => { const n = publishApproved(); setNotice(`${n} campaign${n !== 1 ? "s" : ""} published in this sample workspace.`); }}>Publish reviewed content</Button></div></div>}
-      {studio && <AiCreateStudio initialMonth={month} onClose={() => setStudio(false)} onReview={() => { setStudio(false); setNotice("AI draft ready. Review each changed campaign before publishing."); }} />}
+      {studio && <AiCreateStudio onClose={() => setStudio(false)} onReview={() => { setStudio(false); setNotice("AI draft ready. Review each changed campaign before publishing."); }} />}
       {editing && <CampaignEditor id={editing} onClose={() => setEditing(null)} />}
       <TestCampaignDialog campaign={mk.campaigns.find((c) => c.id === testing) ?? null} open={Boolean(testing)} onClose={() => setTesting(null)} />
       {reviewing && <ReviewWorkspace id={reviewing} onClose={() => setReviewing(null)} />}
