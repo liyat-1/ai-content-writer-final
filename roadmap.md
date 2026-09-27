@@ -202,9 +202,14 @@
 
 ## Final Content workspace redesign
 
-- [ ] Replace campaign AI popup with contextual preview-area editing and a minimizable assistant rail
-- [ ] Add one-month and multi-month scheduled calendar views with a three-column desktop layout
-- [ ] Restore campaign-by-campaign AI generation progress and return to optional review/publish
-- [ ] Redesign Releases as a year-grouped publication timeline with month and campaign version detail
-- [ ] Redesign Results with publication-scoped monthly and campaign result cards and no confidence labels
-- [ ] Verify the full Content, Releases, and Results experience at desktop and mobile widths
+- [x] Replace campaign AI popup with contextual preview-area editing and a minimizable assistant rail
+- [x] Restore campaign-by-campaign AI generation progress and return to optional review/publish
+
+## Meeting-scope Content simplification
+
+- [x] Return Published Content to a focused single-month campaign view
+- [x] Simplify Releases to one selected publication, its timeframe, changes, reasons, and included campaigns
+- [x] Limit Results to the selected publication and matching prior-year timeframe
+- [x] Use click rate, click-to-book, and spam rate with concise AI explanations and external factors
+- [x] Remove confidence, voting, unrelated metrics, and extra reporting navigation
+- [x] Verify Content, Releases, Results, and publication switching at desktop and mobile widths
