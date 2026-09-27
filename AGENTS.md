@@ -13,3 +13,4 @@
 - Directful AI editing uses a centered modal workspace over the existing editor, preserving campaign context instead of opening a side drawer.
 - The package-level AI content planner renders inline above the calendar; campaign-level AI editing remains inside the review workspace's dynamic panel so context never disappears.
 - Content release data (releases, slot versions, risk flags, confidence) lives in src/lib/releases.ts as a mock scenario — one source for Content, Releases and Results.
+- Releases and Results share one publication-led ledger grouped by year, so every metric and drill-down stays attached to an explicit publication.
