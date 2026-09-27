@@ -16,4 +16,4 @@
 - Releases and Results use one selected publication and its matching prior-period comparison; avoid unrelated analytics hierarchies.
 - The year-round foundation remains live underneath seasonal publications; uncovered future months automatically use it until AI content is explicitly scheduled.
 - AI editing transcripts and attachment composer controls use the installed AI Elements primitives so chat behavior stays accessible and consistent.
-- Package AI planning opens as the sole full workspace, minimizes beside the calendar without resetting, and closes back to published content.
+- Package AI planning opens as the sole full workspace, then minimizes into a purpose-built 440px assistant rail beside the calendar without resetting; narrower screens stack instead of compressing.
