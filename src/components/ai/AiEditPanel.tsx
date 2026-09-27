@@ -46,6 +46,7 @@ export function AiEditPanel({
   onClose,
   onEditMyself,
   className = "z-[70]",
+  embedded = false,
 }: {
   title: string;
   copy: Copy;
@@ -53,6 +54,7 @@ export function AiEditPanel({
   onClose: () => void;
   onEditMyself?: () => void;
   className?: string;
+  embedded?: boolean;
 }) {
   const [msgs, setMsgs] = useState<Msg[]>([
     { role: "ai", text: `I'm working on the current ${copy.kind === "email" ? "email" : "text message"} for ${title} — including any edits you've made. What would you like to change?` },
@@ -119,8 +121,8 @@ export function AiEditPanel({
   const chip = (active: boolean) => `rounded-full border px-2.5 py-1 text-[11.5px] transition-colors ${active ? "border-brand bg-brand-soft text-brand" : "border-border text-muted-foreground hover:border-brand/45 hover:text-foreground"}`;
 
   return (
-    <div className={`fixed inset-0 grid place-items-center bg-foreground/25 p-3 backdrop-blur-[3px] sm:p-6 ${className}`} onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-    <aside role="dialog" aria-modal="true" aria-label="Directful AI" className="ai-rise relative flex max-h-[min(82vh,46rem)] w-full max-w-[44rem] flex-col overflow-hidden rounded-xl border border-brand/25 bg-card/95 shadow-float backdrop-blur-xl">
+    <div className={embedded ? "h-full min-h-[520px]" : `fixed inset-0 grid place-items-center bg-foreground/25 p-3 backdrop-blur-[3px] sm:p-6 ${className}`} onMouseDown={(event) => !embedded && event.target === event.currentTarget && onClose()}>
+    <aside role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : "true"} aria-label="Directful AI" className={`ai-rise relative flex w-full flex-col overflow-hidden border border-brand/25 bg-card/95 ${embedded ? "h-full min-h-[520px] rounded-md shadow-none" : "max-h-[min(82vh,46rem)] max-w-[44rem] rounded-xl shadow-float backdrop-blur-xl"}`}>
       <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand" />
       <header className="flex items-start justify-between gap-3 border-b border-border px-4 py-3.5 sm:px-5">
         <div className="min-w-0">

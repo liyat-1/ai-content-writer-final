@@ -169,6 +169,26 @@ export function publishApproved() {
   return approved.length;
 }
 
+export function publishDraftRelease(range: string) {
+  const pending = state.campaigns.filter((campaign) => campaign.status === "Needs review" || campaign.status === "Approved");
+  if (!pending.length) return 0;
+  set((s) => ({
+    ...s,
+    campaigns: s.campaigns.map((campaign) => pending.some((item) => item.id === campaign.id) ? { ...campaign, status: "Published" as Status } : campaign),
+    publications: [{
+      id: `p${s.publications.length + 1}`,
+      name: `${range} release · AI generated`,
+      when: "Today",
+      campaigns: pending.map((campaign) => campaign.id),
+      pieces: pending.reduce((count, campaign) => count + campaign.channels.length * 2, 0),
+      channels: "Email + Text",
+      segments: "Direct + OTA",
+      version: pending.map((campaign) => `v${campaign.version}`).join(", "),
+    }, ...s.publications],
+  }));
+  return pending.length;
+}
+
 /* ---------------------------- AI creation ---------------------------- */
 
 export type Idea = { id: string; group: "Seasonal moments" | "Holidays" | "Hotel events" | "Local events"; emoji: string; name: string; date?: string; month: number; fit: string };
