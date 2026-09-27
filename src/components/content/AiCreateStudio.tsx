@@ -28,7 +28,7 @@ export function AiCreateStudio({ onClose, onReview, onPublish }: { onClose: () =
   const ideas = useMemo(() => ideasFor(range.s, range.e), [range]);
   const rangeLabel = `${MONTHS[range.s]} 2026 → ${MONTHS[range.e]} 2026`;
 
-  useEffect(() => { if (phase !== "generating") return; if (step < STEPS.length) { const timer = window.setTimeout(() => setStep((value) => value + 1), 620); return () => window.clearTimeout(timer); } const timer = window.setTimeout(() => setPhase("ready"), 450); return () => window.clearTimeout(timer); }, [phase, step]);
+  useEffect(() => { if (phase !== "generating") return; if (step < STEPS.length) { const timer = window.setTimeout(() => setStep((value) => value + 1), 620); return () => window.clearTimeout(timer); } const timer = window.setTimeout(() => onReview(), 450); return () => window.clearTimeout(timer); }, [phase, step]);
 
   const submit = (message: PromptInputMessage) => {
     const text = message.text.trim();
