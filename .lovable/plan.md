@@ -26,7 +26,7 @@ The visual direction will follow the supplied references: bright white workspace
 ### 3. Generated-content review
 - After generation, show campaign cards as newly created AI drafts with content snippets and a clear Review action, visually distinct from published cards.
 - Add a top-level **Publish all** action for reviewed campaigns.
-- Make the campaign review area switch dynamically among Preview, Edit with AI, Compare, and Content insight without leaving the review.
+- Reuse the same review popup and visuals as the manual content editor, with Direct/OTA guest selection and the matching content fields always visible. Keep the selected guest segment in context while the preview area switches dynamically among Preview, Edit with AI, Compare, and Content insight, so every mode operates on exactly the content currently selected in the header without leaving the review.
 - Keep manual editing available in the same editor structure used by Automated Invites.
 - Limit AI suggestions to five concise actions; remove the oversized personalization dropdown.
 - Preserve the existing comparison experience and explain what changed, why it is better, and which performance patterns informed it.
