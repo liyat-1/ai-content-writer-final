@@ -191,3 +191,11 @@
 - [x] Give generated cards channel/audience previews and a single Review action
 - [x] Embed AI editing inside the review's dynamic panel instead of opening a second popup
 - [x] Verify the complete release flow at desktop and narrow widths
+
+## Publication-led Releases and Results redesign
+
+- [ ] Add year-grouped publication history with an unmistakable selected and live publication
+- [ ] Rebuild Releases around publication details, AI change summary, months, campaigns, and versions
+- [ ] Rebuild Results around publication-specific KPIs, comparisons, insights, months, and campaigns
+- [ ] Apply the selected editorial-ledger layout with Directful colors and Roboto
+- [ ] Verify both pages and their drill-downs at desktop and mobile widths
