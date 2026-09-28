@@ -36,8 +36,11 @@ export function AiCreateStudio({ onClose, onMinimize, minimized = false, onRevie
     const parsed = parseTimeframe(text);
     if (parsed) setRange(parsed);
     if (text) setDirection((value) => readDirection(text, value));
-    const attachmentNote = message.files.length ? ` I’ll use ${message.files.length} attached file${message.files.length === 1 ? "" : "s"} as planning context.` : "";
-    setMessages((value) => [...value, { role: "user", text: text || `Use the ${message.files.length} attached file${message.files.length === 1 ? "" : "s"}.` }, { role: "assistant", text: `${parsed ? `I updated the release to ${MONTHS[parsed.s]}–${MONTHS[parsed.e]}. ` : ""}I’ll reflect that across the campaign plan.${attachmentNote}` }]);
+    const names = message.files.map((file) => file.filename ?? "file").join(", ");
+    setMessages((value) => [...value, { role: "user", text: text ? `${text}${names ? `\n\n📎 ${names}` : ""}` : `Use ${names}.` }]);
+    void describeAttachments(message.files).then((attachmentNote) => {
+      setMessages((value) => [...value, { role: "assistant", text: `${parsed ? `I updated the release to ${MONTHS[parsed.s]}–${MONTHS[parsed.e]}. ` : ""}${attachmentNote || "I’ll reflect that across the campaign plan."}` }]);
+    });
   };
   const generate = () => { generateAll(ideas, direction, rangeLabel); setStep(0); setPhase("generating"); };
 
