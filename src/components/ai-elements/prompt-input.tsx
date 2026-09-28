@@ -569,6 +569,9 @@ export const PromptInput = ({
           const prefix = pattern.slice(0, -1);
           return f.type.startsWith(prefix);
         }
+        if (pattern.startsWith(".")) {
+          return f.name.toLowerCase().endsWith(pattern.toLowerCase());
+        }
         return f.type === pattern;
       });
     },
