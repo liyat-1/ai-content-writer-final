@@ -6,7 +6,7 @@ import { Conversation, ConversationContent, ConversationScrollButton } from "@/c
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { PromptInput, PromptInputActionAddAttachments, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputFooter, PromptInputSubmit, PromptInputTextarea, PromptInputTools, usePromptInputAttachments, type PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import { AiMark, IMAGES } from "./shared";
-import { CONTEXT_SOURCES, MEDIA_LIBRARY, MONTHS, generateAll, ideasFor, parseTimeframe, readDirection, useLibrary, type Direction } from "@/lib/contentLibrary";
+import { CONTEXT_SOURCES, MEDIA_LIBRARY, MONTHS, generateAll, ideasFor, parseTimeframe, readDirection, useLibrary, type Direction, type Idea } from "@/lib/contentLibrary";
 
 type Phase = "setup" | "discovery" | "plan" | "generating" | "ready";
 const NOW = 8;
@@ -139,8 +139,10 @@ function readDate(cell: string): { month: number; label: string } | null {
   if (iso) { const m = Number(iso[2]) - 1; return m >= 0 && m < 12 ? { month: m, label: `${MONTHS[m].slice(0, 3)} ${Number(iso[3])}` } : null; }
   const us = cell.match(/^(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-]\d{2,4})?$/);
   if (us) { const m = Number(us[1]) - 1; return m >= 0 && m < 12 ? { month: m, label: `${MONTHS[m].slice(0, 3)} ${Number(us[2])}` } : null; }
-  const named = cell.toLowerCase().match(/^([a-z]{3})[a-z]*\.?\s+(\d{1,2})\b/) ?? cell.toLowerCase().match(/^(\d{1,2})\s+([a-z]{3})[a-z]*/)?.slice(0).reverse();
-  if (named) { const key = MONTH_NAMES.includes(named[1]) ? named[1] : named[2]; const day = MONTH_NAMES.includes(named[1]) ? named[2] : named[1]; const m = MONTH_NAMES.indexOf(key); if (m >= 0) return { month: m, label: `${MONTHS[m].slice(0, 3)} ${Number(day)}` }; }
+  const lower = cell.toLowerCase();
+  const md = lower.match(/^([a-z]{3})[a-z]*\.?\s+(\d{1,2})\b/); const dm = lower.match(/^(\d{1,2})\s+([a-z]{3})/);
+  const key = md?.[1] ?? dm?.[2]; const day = md?.[2] ?? dm?.[1]; const m = key ? MONTH_NAMES.indexOf(key) : -1;
+  if (m >= 0) return { month: m, label: `${MONTHS[m].slice(0, 3)} ${Number(day)}` };
   return null;
 }
 
