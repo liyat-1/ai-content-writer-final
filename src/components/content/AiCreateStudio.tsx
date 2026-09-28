@@ -93,7 +93,7 @@ function CompactComposer({ onSubmit }: { onSubmit: (message: PromptInputMessage)
 
 function CompactAttachmentItem({ icon, label }: { icon: React.ReactNode; label: string }) {
   const attachments = usePromptInputAttachments();
-  return <PromptInputActionMenuItem onSelect={(event) => { event.preventDefault(); attachments.openFileDialog(); }}>{icon}{label}</PromptInputActionMenuItem>;
+  return <PromptInputActionMenuItem onSelect={() => { window.setTimeout(() => attachments.openFileDialog(), 50); }}>{icon}{label}</PromptInputActionMenuItem>;
 }
 
 function CompactGeneration({ phase, step, total, rangeLabel, onReview, onPublish }: { phase: Phase; step: number; total: number; rangeLabel: string; onReview: () => void; onPublish: () => void }) {
@@ -107,10 +107,31 @@ function Plan({ rangeLabel, campaigns, ideas, tone, onAdjust, onGenerate }: { ra
 }
 
 function Composer({ onSubmit }: { onSubmit: (message: PromptInputMessage) => void }) {
-  return <div className="relative border-t border-border bg-card/90 px-4 py-3 backdrop-blur-md"><div className="mx-auto max-w-4xl"><TooltipProvider><PromptInput accept="image/*,video/*,.pdf,.doc,.docx,.csv,.xls,.xlsx" multiple maxFiles={8} onSubmit={onSubmit} className="rounded-lg shadow-lift"><ComposerAttachments /><PromptInputTextarea placeholder="Add hotel context, instructions, or a date range…" /><PromptInputFooter><PromptInputTools><PromptInputActionMenu><PromptInputActionMenuTrigger tooltip="Add context" /><PromptInputActionMenuContent><PromptInputActionAddAttachments label="Upload files"><Paperclip />Upload files</PromptInputActionAddAttachments><PromptInputActionMenuItem><FileSpreadsheet />Spreadsheet or CSV</PromptInputActionMenuItem><PromptInputActionMenuItem><FileText />Document</PromptInputActionMenuItem><PromptInputActionMenuItem><Image />Image</PromptInputActionMenuItem><PromptInputActionMenuItem><Video />Video</PromptInputActionMenuItem></PromptInputActionMenuContent></PromptInputActionMenu><span className="hidden text-[11px] text-muted-foreground sm:inline">Documents, sheets, images, and video</span></PromptInputTools><PromptInputSubmit status="ready" /></PromptInputFooter></PromptInput></TooltipProvider></div></div>;
+  return <div className="relative border-t border-border bg-card/90 px-4 py-3 backdrop-blur-md"><div className="mx-auto max-w-4xl"><TooltipProvider><PromptInput accept="image/*,video/*,.pdf,.doc,.docx,.csv,.xls,.xlsx" multiple maxFiles={8} onSubmit={onSubmit} className="rounded-lg shadow-lift"><ComposerAttachments /><PromptInputTextarea placeholder="Add hotel context, instructions, or a date range…" /><PromptInputFooter><PromptInputTools><PromptInputActionMenu><PromptInputActionMenuTrigger tooltip="Add context" /><PromptInputActionMenuContent><CompactAttachmentItem icon={<FileSpreadsheet size={14} />} label="Events calendar (CSV / sheet)" /><CompactAttachmentItem icon={<FileText size={14} />} label="Document" /><CompactAttachmentItem icon={<Image size={14} />} label="Photos" /><CompactAttachmentItem icon={<Video size={14} />} label="Video" /></PromptInputActionMenuContent></PromptInputActionMenu><span className="hidden text-[11px] text-muted-foreground sm:inline">Documents, sheets, images, and video</span></PromptInputTools><PromptInputSubmit status="ready" /></PromptInputFooter></PromptInput></TooltipProvider></div></div>;
 }
 
 function Generation({ phase, step, total, rangeLabel, onReview, onPublish }: { phase: Phase; step: number; total: number; rangeLabel: string; onReview: () => void; onPublish: () => void }) {
   const ready = phase === "ready";
   return <main className="relative min-h-[560px] overflow-hidden p-5 sm:p-9"><div className="pointer-events-none absolute inset-0 ai-surface opacity-70" /><section className="relative mx-auto max-w-5xl"><div className="grid gap-7 lg:grid-cols-[.72fr_1.28fr]"><div className="flex flex-col justify-center py-5"><AiMark size={58} live={!ready} /><p className="mt-5 text-[11px] font-semibold uppercase text-brand">{ready ? "Release ready" : `${Math.min(step + 1, STEPS.length)} of ${STEPS.length} campaigns`}</p><h2 className="mt-2 font-display text-[28px] font-semibold text-card-foreground sm:text-[36px]">{ready ? `Generated for ${rangeLabel}` : `Writing ${STEPS[Math.min(step, STEPS.length - 1)]}`}</h2><p className="mt-3 max-w-md text-[13px] leading-6 text-muted-foreground">{ready ? "Review any campaign you want, or publish the complete release now." : "Direct and OTA guest versions are being shaped for Email and Text, then checked against the seasonal plan."}</p><div className="mt-6 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-brand transition-[width] duration-500" style={{ width: `${Math.min(100, step / STEPS.length * 100)}%` }} /></div></div><div className="grid gap-2 sm:grid-cols-2">{STEPS.map((label, index) => <div key={label} className={`relative overflow-hidden rounded-md border p-3.5 transition-colors ${index < step || ready ? "border-brand/20 bg-card text-card-foreground" : index === step ? "border-brand bg-brand-soft text-brand shadow-card" : "border-border bg-card/60 text-muted-foreground"}`}>{index === step && !ready && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-brand [animation:ai-sweep_1.2s_ease-in-out_infinite]" />}<div className="flex items-start gap-3">{index < step || ready ? <span className="grid size-7 shrink-0 place-items-center rounded-md bg-brand text-brand-foreground"><Check size={13} /></span> : index === step ? <span className="grid size-7 shrink-0 place-items-center rounded-md bg-brand-soft text-brand"><Loader2 size={14} className="animate-spin" /></span> : <span className="grid size-7 shrink-0 place-items-center rounded-md bg-muted text-[10px] font-semibold">{index + 1}</span>}<div><p className="text-[12.5px] font-semibold">{label}</p><p className="mt-1 text-[10.5px] opacity-75">{index < step || ready ? "Direct + OTA · Email + Text complete" : index === step ? "Writing guest-specific versions…" : "Queued"}</p></div></div></div>)}</div></div>{ready && <div className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-brand/25 bg-card p-5 shadow-lift"><span className="grid size-10 place-items-center rounded-md bg-brand-soft text-brand"><Sparkles size={18} /></span><div className="min-w-52 flex-1"><p className="text-[13px] font-semibold text-card-foreground">{total} campaigns are ready</p><p className="text-[11.5px] text-muted-foreground">Review is optional. Publishing makes the full release live for the selected timeframe.</p></div><Button variant="outline" onClick={onReview}>Review campaigns</Button><Button variant="brand" onClick={onPublish}>Publish release <ArrowRight /></Button></div>}</section></main>;
+}
+
+async function describeAttachments(files: PromptInputMessage["files"]): Promise<string> {
+  if (!files.length) return "";
+  const notes: string[] = [];
+  for (const file of files) {
+    const name = file.filename ?? "file";
+    const isSheet = /\.(csv|tsv|txt)$/i.test(name) || /csv|text/.test(file.mediaType ?? "");
+    if (isSheet && file.url) {
+      try {
+        const raw = await (await fetch(file.url)).text();
+        const rows = raw.split(/\r?\n/).map((line) => line.split(/[,;\t]/).map((cell) => cell.replace(/^"|"$/g, "").trim())).filter((row) => row.some(Boolean));
+        const body = rows.length > 1 && !/\d/.test(rows[0].join("")) ? rows.slice(1) : rows;
+        const events = body.map((row) => row.find((cell) => cell && !/^[\d\/.\-: ]+$/.test(cell)) ?? row[0]).filter(Boolean);
+        notes.push(`I read ${events.length} event${events.length === 1 ? "" : "s"} from ${name}${events.length ? ` — including ${events.slice(0, 4).join(", ")}${events.length > 4 ? "…" : ""}` : ""}. I’ll schedule campaigns around these dates.`);
+        continue;
+      } catch { /* fall through */ }
+    }
+    notes.push(file.mediaType?.startsWith("image/") ? `I’ll use ${name} as imagery in the plan.` : file.mediaType?.startsWith("video/") ? `I’ll feature ${name} where video fits.` : `I’ll use ${name} as planning context.`);
+  }
+  return notes.join(" ");
 }

@@ -1168,7 +1168,7 @@ export const PromptInputButton = ({
 
 export type PromptInputActionMenuProps = ComponentProps<typeof DropdownMenu>;
 export const PromptInputActionMenu = (props: PromptInputActionMenuProps) => (
-  <DropdownMenu {...props} />
+  <DropdownMenu modal={false} {...props} />
 );
 
 export type PromptInputActionMenuTriggerProps = PromptInputButtonProps;

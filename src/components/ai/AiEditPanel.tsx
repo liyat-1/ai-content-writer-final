@@ -289,5 +289,5 @@ export function AiEditPanel({
 
 function AttachmentMenuItem({ icon, label }: { icon: React.ReactNode; label: string }) {
   const attachments = usePromptInputAttachments();
-  return <PromptInputActionMenuItem onSelect={(event) => { event.preventDefault(); attachments.openFileDialog(); }}>{icon}{label}</PromptInputActionMenuItem>;
+  return <PromptInputActionMenuItem onSelect={() => { window.setTimeout(() => attachments.openFileDialog(), 50); }}>{icon}{label}</PromptInputActionMenuItem>;
 }
