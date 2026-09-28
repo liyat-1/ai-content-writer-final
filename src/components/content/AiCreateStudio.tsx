@@ -6,7 +6,7 @@ import { Conversation, ConversationContent, ConversationScrollButton } from "@/c
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { PromptInput, PromptInputActionAddAttachments, PromptInputActionMenu, PromptInputActionMenuContent, PromptInputActionMenuItem, PromptInputActionMenuTrigger, PromptInputFooter, PromptInputSubmit, PromptInputTextarea, PromptInputTools, usePromptInputAttachments, type PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import { AiMark, IMAGES } from "./shared";
-import { CONTEXT_SOURCES, MEDIA_LIBRARY, MONTHS, generateAll, ideasFor, parseTimeframe, readDirection, useLibrary, type Direction } from "@/lib/contentLibrary";
+import { CONTEXT_SOURCES, MEDIA_LIBRARY, MONTHS, generateAll, ideasFor, parseTimeframe, readDirection, useLibrary, type Direction, type Idea } from "@/lib/contentLibrary";
 
 type Phase = "setup" | "discovery" | "plan" | "generating" | "ready";
 const NOW = 8;
@@ -25,7 +25,12 @@ export function AiCreateStudio({ onClose, onMinimize, minimized = false, onRevie
   const [direction, setDirection] = useState<Direction>({ tone: ["warm"], avoid: [], notes: [] });
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; text: string }[]>([]);
   const [step, setStep] = useState(0);
-  const ideas = useMemo(() => ideasFor(range.s, range.e), [range]);
+  const [uploaded, setUploaded] = useState<Idea[]>([]);
+  const ideas = useMemo(() => {
+    const own = uploaded.filter((i) => i.month >= range.s && i.month <= range.e);
+    const ownNames = new Set(own.map((i) => i.name.toLowerCase()));
+    return [...own, ...ideasFor(range.s, range.e).filter((i) => !ownNames.has(i.name.toLowerCase()))];
+  }, [range, uploaded]);
   const rangeLabel = `${MONTHS[range.s]} 2026 → ${MONTHS[range.e]} 2026`;
 
   useEffect(() => { if (phase !== "generating") return; if (step < STEPS.length) { const timer = window.setTimeout(() => setStep((value) => value + 1), 460); return () => window.clearTimeout(timer); } const timer = window.setTimeout(() => onReview(), 650); return () => window.clearTimeout(timer); }, [phase, step, onReview]);
@@ -38,8 +43,19 @@ export function AiCreateStudio({ onClose, onMinimize, minimized = false, onRevie
     if (text) setDirection((value) => readDirection(text, value));
     const names = message.files.map((file) => file.filename ?? "file").join(", ");
     setMessages((value) => [...value, { role: "user", text: text ? `${text}${names ? `\n\n📎 ${names}` : ""}` : `Use ${names}.` }]);
-    void describeAttachments(message.files).then((attachmentNote) => {
-      setMessages((value) => [...value, { role: "assistant", text: `${parsed ? `I updated the release to ${MONTHS[parsed.s]}–${MONTHS[parsed.e]}. ` : ""}${attachmentNote || "I’ll reflect that across the campaign plan."}` }]);
+    const base = parsed ?? range;
+    void readAttachments(message.files).then(({ note, events }) => {
+      let widened = "";
+      if (events.length) {
+        setUploaded((value) => [...value.filter((v) => !events.some((e) => e.id === v.id)), ...events]);
+        const future = events.map((e) => e.month).filter((m) => m >= NOW);
+        if (!parsed && future.length) {
+          const next = { s: Math.min(base.s, ...future), e: Math.max(base.e, ...future) };
+          if (next.s !== base.s || next.e !== base.e) { setRange(next); widened = `I widened the release to ${MONTHS[next.s]}–${MONTHS[next.e]} to cover your dates. `; }
+        }
+        setPhase((p) => p === "setup" ? "discovery" : p);
+      }
+      setMessages((value) => [...value, { role: "assistant", text: `${parsed ? `I updated the release to ${MONTHS[parsed.s]}–${MONTHS[parsed.e]}. ` : ""}${widened}${note || "I’ll reflect that across the campaign plan."}` }]);
     });
   };
   const generate = () => { generateAll(ideas, direction, rangeLabel); setStep(0); setPhase("generating"); };
@@ -115,23 +131,52 @@ function Generation({ phase, step, total, rangeLabel, onReview, onPublish }: { p
   return <main className="relative min-h-[560px] overflow-hidden p-5 sm:p-9"><div className="pointer-events-none absolute inset-0 ai-surface opacity-70" /><section className="relative mx-auto max-w-5xl"><div className="grid gap-7 lg:grid-cols-[.72fr_1.28fr]"><div className="flex flex-col justify-center py-5"><AiMark size={58} live={!ready} /><p className="mt-5 text-[11px] font-semibold uppercase text-brand">{ready ? "Release ready" : `${Math.min(step + 1, STEPS.length)} of ${STEPS.length} campaigns`}</p><h2 className="mt-2 font-display text-[28px] font-semibold text-card-foreground sm:text-[36px]">{ready ? `Generated for ${rangeLabel}` : `Writing ${STEPS[Math.min(step, STEPS.length - 1)]}`}</h2><p className="mt-3 max-w-md text-[13px] leading-6 text-muted-foreground">{ready ? "Review any campaign you want, or publish the complete release now." : "Direct and OTA guest versions are being shaped for Email and Text, then checked against the seasonal plan."}</p><div className="mt-6 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-brand transition-[width] duration-500" style={{ width: `${Math.min(100, step / STEPS.length * 100)}%` }} /></div></div><div className="grid gap-2 sm:grid-cols-2">{STEPS.map((label, index) => <div key={label} className={`relative overflow-hidden rounded-md border p-3.5 transition-colors ${index < step || ready ? "border-brand/20 bg-card text-card-foreground" : index === step ? "border-brand bg-brand-soft text-brand shadow-card" : "border-border bg-card/60 text-muted-foreground"}`}>{index === step && !ready && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-brand [animation:ai-sweep_1.2s_ease-in-out_infinite]" />}<div className="flex items-start gap-3">{index < step || ready ? <span className="grid size-7 shrink-0 place-items-center rounded-md bg-brand text-brand-foreground"><Check size={13} /></span> : index === step ? <span className="grid size-7 shrink-0 place-items-center rounded-md bg-brand-soft text-brand"><Loader2 size={14} className="animate-spin" /></span> : <span className="grid size-7 shrink-0 place-items-center rounded-md bg-muted text-[10px] font-semibold">{index + 1}</span>}<div><p className="text-[12.5px] font-semibold">{label}</p><p className="mt-1 text-[10.5px] opacity-75">{index < step || ready ? "Direct + OTA · Email + Text complete" : index === step ? "Writing guest-specific versions…" : "Queued"}</p></div></div></div>)}</div></div>{ready && <div className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-brand/25 bg-card p-5 shadow-lift"><span className="grid size-10 place-items-center rounded-md bg-brand-soft text-brand"><Sparkles size={18} /></span><div className="min-w-52 flex-1"><p className="text-[13px] font-semibold text-card-foreground">{total} campaigns are ready</p><p className="text-[11.5px] text-muted-foreground">Review is optional. Publishing makes the full release live for the selected timeframe.</p></div><Button variant="outline" onClick={onReview}>Review campaigns</Button><Button variant="brand" onClick={onPublish}>Publish release <ArrowRight /></Button></div>}</section></main>;
 }
 
-async function describeAttachments(files: PromptInputMessage["files"]): Promise<string> {
-  if (!files.length) return "";
+const MONTH_NAMES = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+
+/** Read a date-ish cell into a month index and a short label like "Oct 18". */
+function readDate(cell: string): { month: number; label: string } | null {
+  const iso = cell.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) { const m = Number(iso[2]) - 1; return m >= 0 && m < 12 ? { month: m, label: `${MONTHS[m].slice(0, 3)} ${Number(iso[3])}` } : null; }
+  const us = cell.match(/^(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-]\d{2,4})?$/);
+  if (us) { const m = Number(us[1]) - 1; return m >= 0 && m < 12 ? { month: m, label: `${MONTHS[m].slice(0, 3)} ${Number(us[2])}` } : null; }
+  const lower = cell.toLowerCase();
+  const md = lower.match(/^([a-z]{3})[a-z]*\.?\s+(\d{1,2})\b/); const dm = lower.match(/^(\d{1,2})\s+([a-z]{3})/);
+  const key = md?.[1] ?? dm?.[2]; const day = md?.[2] ?? dm?.[1]; const m = key ? MONTH_NAMES.indexOf(key) : -1;
+  if (m >= 0) return { month: m, label: `${MONTHS[m].slice(0, 3)} ${Number(day)}` };
+  return null;
+}
+
+function parseCalendar(raw: string, source: string): Idea[] {
+  const rows = raw.split(/\r?\n/).map((line) => line.split(/[,;\t]/).map((cell) => cell.replace(/^"|"$/g, "").trim())).filter((row) => row.some(Boolean));
+  const events: Idea[] = [];
+  rows.forEach((row, index) => {
+    const dateCell = row.find((cell) => readDate(cell));
+    const date = dateCell ? readDate(dateCell) : null;
+    const name = row.find((cell) => cell && cell !== dateCell && /[a-z]/i.test(cell) && !readDate(cell));
+    if (!date || !name) return;
+    const extra = row.filter((cell) => cell && cell !== dateCell && cell !== name && !readDate(cell)).join(" · ");
+    const holiday = /holiday|\bday\b|\beve\b|christmas|new year|thanksgiving|halloween/i.test(`${name} ${extra}`);
+    events.push({ id: `upload-${source}-${index}`, group: holiday ? "Holidays" : "Hotel events", emoji: holiday ? "🎉" : "📅", name, date: date.label, month: date.month, fit: extra || `From ${source}` });
+  });
+  return events;
+}
+
+async function readAttachments(files: PromptInputMessage["files"]): Promise<{ note: string; events: Idea[] }> {
+  if (!files.length) return { note: "", events: [] };
   const notes: string[] = [];
+  const all: Idea[] = [];
   for (const file of files) {
     const name = file.filename ?? "file";
     const isSheet = /\.(csv|tsv|txt)$/i.test(name) || /csv|text/.test(file.mediaType ?? "");
     if (isSheet && file.url) {
       try {
-        const raw = await (await fetch(file.url)).text();
-        const rows = raw.split(/\r?\n/).map((line) => line.split(/[,;\t]/).map((cell) => cell.replace(/^"|"$/g, "").trim())).filter((row) => row.some(Boolean));
-        const body = rows.length > 1 && !/\d/.test(rows[0].join("")) ? rows.slice(1) : rows;
-        const events = body.map((row) => row.find((cell) => cell && !/^[\d\/.\-: ]+$/.test(cell)) ?? row[0]).filter(Boolean);
-        notes.push(`I read ${events.length} event${events.length === 1 ? "" : "s"} from ${name}${events.length ? ` — including ${events.slice(0, 4).join(", ")}${events.length > 4 ? "…" : ""}` : ""}. I’ll schedule campaigns around these dates.`);
+        const events = parseCalendar(await (await fetch(file.url)).text(), name);
+        all.push(...events);
+        notes.push(events.length ? `I read ${events.length} dated event${events.length === 1 ? "" : "s"} from ${name} — ${events.slice(0, 4).map((e) => `${e.name} (${e.date})`).join(", ")}${events.length > 4 ? "…" : ""}. They’re now in your plan, and campaigns will be written around them.` : `I couldn’t find dated events in ${name}. Use one row per event with a date and a name, e.g. "2026-10-18, Annual Conference".`);
         continue;
       } catch { /* fall through */ }
     }
-    notes.push(file.mediaType?.startsWith("image/") ? `I’ll use ${name} as imagery in the plan.` : file.mediaType?.startsWith("video/") ? `I’ll feature ${name} where video fits.` : `I’ll use ${name} as planning context.`);
+    notes.push(/\.xlsx?$/i.test(name) ? `I can’t read Excel files yet — save ${name} as CSV and attach it again.` : file.mediaType?.startsWith("image/") ? `I’ll use ${name} as imagery in the plan.` : file.mediaType?.startsWith("video/") ? `I’ll feature ${name} where video fits.` : `I’ll use ${name} as planning context.`);
   }
-  return notes.join(" ");
+  return { note: notes.join(" "), events: all };
 }
