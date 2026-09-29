@@ -39,7 +39,8 @@ export async function askGateway(system: string, content: UserContent): Promise<
     onError: ({ error }) => { failure = error; },
     providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", store: false, include: ["reasoning.encrypted_content"] } },
   });
-  const text = await result.text.catch((e) => { failure ??= e; return ""; });
+  let text = "";
+  try { text = await result.text; } catch (e) { failure ??= e; }
   if (failure || !text) {
     const status = (failure as { statusCode?: number } | undefined)?.statusCode;
     if (status === 429) throw new Error("The AI is busy right now — try again in a moment.");
