@@ -16,6 +16,10 @@ import {
   usePromptInputAttachments,
 } from "@/components/ai-elements/prompt-input";
 import { AiMark } from "@/components/content/shared";
+import { ComposerThumbs, SentThumbs, type SentFile } from "./AttachmentThumbs";
+import { ACCEPT_ALL, prepareAttachments, type AttachmentInput } from "@/lib/attachments";
+import { editAssist } from "@/lib/ai.functions";
+import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Sparkle } from "./Sparkle";
 import {
   EDIT_QUICK_ACTIONS,
@@ -30,24 +34,9 @@ import {
 } from "@/lib/aiWriter";
 
 type Msg =
-  | { role: "user"; text: string }
+  | { role: "user"; text: string; files?: SentFile[] }
   | { role: "ai"; text: string; proposal?: { copy: Copy; changes: string[]; why: string; state: "open" | "applied" | "kept" } };
 
-function ComposerAttachments() {
-  const attachments = usePromptInputAttachments();
-  if (!attachments.files.length) return null;
-  return (
-    <div className="flex flex-wrap gap-2 px-3 pt-3">
-      {attachments.files.map((file) => (
-        <div key={file.id} className="flex max-w-48 items-center gap-2 rounded-md border border-border bg-muted/55 px-2 py-1.5 text-[11px] text-card-foreground">
-          {file.mediaType?.startsWith("image/") ? <Image size={14} /> : file.mediaType?.startsWith("video/") ? <Video size={14} /> : <FileText size={14} />}
-          <span className="truncate">{file.filename ?? "Attachment"}</span>
-          <Button type="button" variant="ghost" size="icon-sm" className="size-5" onClick={() => attachments.remove(file.id)} aria-label={`Remove ${file.filename ?? "attachment"}`}><X size={12} /></Button>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export function copyText(copy: Copy) {
   return copy.kind === "text"
@@ -114,39 +103,40 @@ export function AiEditPanel({
     return null;
   };
 
-  const ask = (request: string, opts?: { personalize?: Personalize; retry?: boolean }) => {
+  const [busy, setBusy] = useState(false);
+  const ask = async (request: string, opts?: { personalize?: Personalize; retry?: boolean }, files: AttachmentInput[] = []) => {
     const q = request.trim();
-    if (!q) return;
+    if ((!q && !files.length) || busy) return;
     const r = q.toLowerCase();
-    // Session memory: constraints stated earlier keep applying.
     const nextMemory = [...memory];
     if (/(don'?t|do not|no|without).{0,20}(discount|offer|promo)/.test(r)) nextMemory.push("don't mention the discount");
     setMemory(nextMemory);
-
     const open = openProposal();
-    let base: Copy = open && !/current version|from the current|start over/.test(r) ? open : copy;
-    // "keep the first paragraph from the current version but use the CTA from the new version"
-    if (open && /cta from the (new|suggest)/.test(r) && copy.kind === "email" && open.kind === "email") {
-      base = { kind: "email", email: { ...copy.email, ctaLabel: open.email.ctaLabel } };
-    }
-    const nextSeed = opts?.retry ? seed + 1 : seed;
-    setSeed(nextSeed + 1);
-    const withMemory = [q, ...nextMemory.filter((c) => !r.includes(c))].join(". ");
-    const result = refine(base, withMemory, nextSeed, opts?.personalize);
-    const kindChanged = result.copy.kind !== copy.kind;
+    const base: Copy = open && !/current version|from the current|start over/.test(r) ? open : copy;
     setLastRequest(q);
-    setMsgs((m) => [
-      ...m.map((x) => (x.role === "ai" && x.proposal?.state === "open" ? { ...x, proposal: { ...x.proposal, state: "kept" as const } } : x)),
-      ...(opts?.retry ? [] : [{ role: "user" as const, text: q }]),
-      {
-        role: "ai",
-        text: kindChanged ? result.reply : opts?.retry ? "Here's a different take on the same request." : result.reply,
-        proposal: { copy: result.copy, changes: result.changes, why: result.why, state: "open" },
-      },
-    ]);
     setInput("");
     setCompareIdx(null);
+    const sent: SentFile[] = files.map((f) => ({ name: f.filename ?? "file", mediaType: f.mediaType ?? "", preview: f.mediaType?.startsWith("image/") ? f.url : undefined }));
+    setMsgs((m) => [
+      ...m.map((x) => (x.role === "ai" && x.proposal?.state === "open" ? { ...x, proposal: { ...x.proposal, state: "kept" as const } } : x)),
+      ...(opts?.retry ? [] : [{ role: "user" as const, text: q || "Use these files.", files: sent }]),
+    ]);
+    setBusy(true);
+    const prepared = await prepareAttachments(files);
+    if (prepared.some((p) => p.kind === "video" && p.dataUrl)) setMsgs((m) => m.map((x, i) => i === m.length - 1 && x.role === "user" && x.files ? { ...x, files: x.files.map((f, j) => ({ ...f, preview: prepared[j]?.dataUrl?.startsWith("data:image") ? prepared[j].dataUrl : f.preview })) } : x));
+    const history = msgs.map((m) => ({ role: m.role === "ai" ? "assistant" as const : "user" as const, text: m.text }));
+    const request2 = [opts?.retry ? `${q}. Give a clearly different take than before.` : q, ...nextMemory.filter((c) => !r.includes(c))].filter(Boolean).join(". ");
+    const current = base.kind === "email" ? base.email : base.text;
+    const res = await editAssist({ data: { text: request2, files: prepared, history, kind: base.kind, copy: current, campaign: title } }).catch(() => ({ reply: "", copy: null, changes: [], why: "", error: "The AI couldn't be reached. Please try again." }));
+    setBusy(false);
+    if (res.error) {
+      setMsgs((m) => [...m, { role: "ai", text: `⚠️ ${res.error}` }]);
+      return;
+    }
+    const next: Copy | null = res.copy ? (base.kind === "email" ? { kind: "email", email: { ...base.email, ...res.copy } as Copy extends infer C ? C extends { kind: "email"; email: infer E } ? E : never : never } : { kind: "text", text: { message: res.copy.message ?? base.text.message } }) : null;
+    setMsgs((m) => [...m, { role: "ai", text: res.reply || "Here's a suggestion.", proposal: next ? { copy: next, changes: res.changes.slice(0, 4), why: res.why, state: "open" } : undefined }]);
   };
+  void refine; void seed; void setSeed;
 
   const setState = (idx: number, state: "applied" | "kept") =>
     setMsgs((m) => m.map((x, i) => (i === idx && x.role === "ai" && x.proposal ? { ...x, proposal: { ...x.proposal, state } } : x)));
@@ -171,7 +161,7 @@ export function AiEditPanel({
       <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-4 py-6 sm:px-5">
         {msgs.map((m, idx) =>
           m.role === "user" ? (
-            <Message key={idx} from="user" className="max-w-[85%]"><MessageContent className="bg-primary px-3 py-2 text-[12.5px] text-primary-foreground"><MessageResponse>{m.text}</MessageResponse></MessageContent></Message>
+            <div key={idx}><SentThumbs files={m.files} /><Message from="user" className="max-w-[85%]"><MessageContent className="bg-primary px-3 py-2 text-[12.5px] text-primary-foreground"><MessageResponse>{m.text}</MessageResponse></MessageContent></Message></div>
           ) : (
             <div key={idx} className="space-y-3">
                <Message from="assistant" className="max-w-full"><MessageContent className="w-full bg-transparent p-0"><div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 text-[12.5px] leading-relaxed text-card-foreground"><AiMark size={28} /><MessageResponse className="pt-1">{m.text}</MessageResponse></div></MessageContent></Message>
@@ -219,6 +209,7 @@ export function AiEditPanel({
             </div>
           ),
         )}
+        {busy && <div className="flex items-center gap-3"><AiMark size={28} live /><Shimmer className="text-[12.5px]">Reading your request and files…</Shimmer></div>}
         <div ref={endRef} />
       </div>
 
@@ -247,17 +238,16 @@ export function AiEditPanel({
           </div>
         )}
         <TooltipProvider><PromptInput
-          accept="image/*,video/*,application/pdf,text/plain,.doc,.docx,.ppt,.pptx"
+          accept={ACCEPT_ALL}
           multiple
           maxFiles={6}
           maxFileSize={20 * 1024 * 1024}
           onSubmit={({ text, files }) => {
-            const attachmentNote = files.length ? `${text ? "\n\n" : ""}Use attached ${files.map((file) => file.filename ?? "file").join(", ")}.` : "";
-            ask(`${text}${attachmentNote}`);
+            void ask(text, undefined, files.map((f) => ({ url: f.url, filename: f.filename, mediaType: f.mediaType })));
           }}
           className="[&_[data-slot=input-group]]:rounded-xl [&_[data-slot=input-group]]:border-border [&_[data-slot=input-group]]:bg-card [&_[data-slot=input-group]]:shadow-lift [&_[data-slot=input-group]]:focus-within:border-brand"
         >
-          <ComposerAttachments />
+          <ComposerThumbs />
           <PromptInputTextarea
             ref={inputRef}
             value={input}
@@ -277,7 +267,7 @@ export function AiEditPanel({
               </PromptInputActionMenu>
               <span className="hidden text-[11px] text-muted-foreground sm:inline">Photos, video, or files</span>
             </PromptInputTools>
-            <PromptInputSubmit status="ready" className="size-9 rounded-md bg-foreground text-background hover:bg-foreground/90" disabled={!input.trim()} />
+            <PromptInputSubmit status="ready" className="size-9 rounded-md bg-foreground text-background hover:bg-foreground/90" disabled={busy} />
           </PromptInputFooter>
         </PromptInput></TooltipProvider>
         <p className="mt-2 text-center text-[10.5px] text-muted-foreground">Review every suggestion before it changes your content.</p>
