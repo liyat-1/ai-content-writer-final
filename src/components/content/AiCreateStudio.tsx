@@ -16,11 +16,6 @@ type Phase = "setup" | "discovery" | "plan" | "generating" | "ready";
 const NOW = 8;
 const STEPS = ["After Last Visit", "3 Months", "6 Months", "9 Months", "12 Months", "15 Months+", "Booking Confirmation", "Pre-Arrival", "Welcome Message", "Post-Stay Thank You"];
 
-function ComposerAttachments() {
-  const { files, remove } = usePromptInputAttachments();
-  if (!files.length) return null;
-  return <div className="flex gap-2 overflow-x-auto px-3 pt-3">{files.map((file) => <div key={file.id} className="flex shrink-0 items-center gap-2 rounded-md border border-border bg-muted/45 px-2.5 py-2 text-[11.5px] text-card-foreground"><FileText size={13} className="text-brand" /><span className="max-w-36 truncate">{file.filename ?? "Attachment"}</span><Button type="button" variant="ghost" size="icon-sm" aria-label={`Remove ${file.filename ?? "attachment"}`} onClick={() => remove(file.id)}><X size={13} /></Button></div>)}</div>;
-}
 
 export function AiCreateStudio({ onClose, onMinimize, minimized = false, onReview, onPublish }: { onClose: () => void; onMinimize: () => void; minimized?: boolean; onReview: () => void; onPublish: (range: string) => void }) {
   const { campaigns } = useLibrary();
